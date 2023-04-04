@@ -33,6 +33,7 @@ urlpatterns = [
     path('getdefaultlimits/', views.get_default_limits),
     path('getuserlimits/<str:user>', views.check_payment_user_limit),
     path('create_package/', views.create_package, name='create_package'),
+    path('edit_package/', views.edit_package, name='edit_package')
 
 ]
 

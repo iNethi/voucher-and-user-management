@@ -12,7 +12,10 @@ from rest_framework.response import Response
 from rest_framework import status
 import pytz
 
-PriceToPackageMap = {"1": ["TIME30M", 1800, "1W"], "2": ["TIME1H", 3600, "2W"], "5": ["TIME24H", 10800, "1M"], "10": ["DATA1G", 2592000, "3M"]}
+PriceToPackageMap = {"1": ["TIME30M", 1800, "1W"], "2": ["TIME1H", 3600, "2W"], "5": ["TIME24H", 10800, "1M"],
+                     "10": ["DATA1G", 2592000, "3M"]}
+
+
 @api_view(['GET'])
 def check_payment_user_limit(request, format=None):
     if request.method == 'GET':
@@ -156,7 +159,8 @@ def purchase(request, format=None):
                 try:
                     start = datetime.now() - timedelta(seconds=limit.payment_limit_period_sec)
                     latest_payments = Payment.objects.filter(user_id=user,
-                                                             paydate_time__range=[start, datetime.now(tz=pytz.utc)]).values_list('amount', flat=True)
+                                                             paydate_time__range=[start, datetime.now(
+                                                                 tz=pytz.utc)]).values_list('amount', flat=True)
                     latest_payments = list(latest_payments)
                     for payments in latest_payments:
                         total_spent = total_spent + payments
@@ -168,7 +172,7 @@ def purchase(request, format=None):
             if last_payment is not None:
 
                 # Get new voucher
-                #chosenProfile = "TIME30M"
+                # chosenProfile = "TIME30M"
                 # print(PriceToPackageMap)
 
                 if str(amount) in PriceToPackageMap:
@@ -207,7 +211,8 @@ def purchase(request, format=None):
                     if delta.seconds > limit.payment_limit_period_sec or total_spent <= limit.payment_limit:
                         try:
                             if voucher:
-                                payment = Payment.objects.create(user_id=user, payment_method=payment_method, amount=amount,
+                                payment = Payment.objects.create(user_id=user, payment_method=payment_method,
+                                                                 amount=amount,
                                                                  paydate_time=datetime.now(
                                                                      tz=pytz.UTC),
                                                                  service_type_id=service_type,
@@ -215,7 +220,8 @@ def purchase(request, format=None):
                                                                  package=chosenProfile,
                                                                  voucher=voucherName)
                             else:
-                                payment = Payment.objects.create(user_id=user, payment_method=payment_method, amount=amount,
+                                payment = Payment.objects.create(user_id=user, payment_method=payment_method,
+                                                                 amount=amount,
                                                                  paydate_time=datetime.now(
                                                                      tz=pytz.UTC),
                                                                  service_type_id=service_type,
@@ -490,3 +496,32 @@ def create_package(request, format=None):
         return JsonResponse(serializer.data, status=201)
     return JsonResponse(serializer.errors, status=400)
 
+
+@api_view(['PUT'])
+def edit_package(request, format=None):
+    try:
+        package = Package.objects.get(amount=request.data['amount'])
+    except Package.DoesNotExist:
+        return JsonResponse({'error': 'Package does not exist.'}, status=404)
+
+    serializer = PackageSerializer(package, data=request.data)
+    if serializer.is_valid():
+        # Check if there is an existing Package object with the same name or amount
+        name = serializer.validated_data.get('name', package.name)
+        try:
+            existing_package = Package.objects.exclude(amount=package.amount).get(name=name)
+            return JsonResponse({'error': 'A Package with this name already exists.'}, status=400)
+        except Package.DoesNotExist:
+            pass
+
+        amount = serializer.validated_data.get('amount', package.amount)
+        try:
+            existing_package = Package.objects.exclude(id=package.id).get(amount=amount)
+            return JsonResponse({'error': 'A Package with this amount already exists.'}, status=400)
+        except Package.DoesNotExist:
+            pass
+
+        # Update the existing Package object
+        serializer.save()
+        return JsonResponse(serializer.data)
+    return JsonResponse(serializer.errors, status=400)

@@ -37,3 +37,14 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
+
+## Terminal Endpoint Testing
+1. Create a package
+```
+http POST http://localhost:8000/create_package/ name='Package B' amount=1010 time_period=30
+```
+2. Edit a package
+```
+curl -X PUT -H "Content-Type: application/json" -d '{"name": "Package 1", "amount": 100, "time_period": 30}' http://localhost:8000/edit_package/
+```
+3. 
