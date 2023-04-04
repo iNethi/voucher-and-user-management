@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from django.http import JsonResponse
 from .models import *
+from django.db import IntegrityError
 from .radiusdesk.models import *
 from .serializers import *
 from rest_framework.decorators import api_view
@@ -465,3 +466,27 @@ def check_payment_user_limit(request, user):
             return JsonResponse(status=400, data={'error': 'no user found'})
         except UserPaymentLimits.DoesNotExist:
             return JsonResponse(status=404, data={'error': 'user payment limit not set'})
+
+
+@api_view(['POST'])
+def create_package(request, format=None):
+    serializer = PackageSerializer(data=request.data)
+    if serializer.is_valid():
+        try:
+            # Check if there is an existing Package object with the same name or amount
+            existing_package = Package.objects.get(name=serializer.validated_data['name'])
+            return JsonResponse({'error': 'A Package with this name already exists.'}, status=400)
+        except Package.DoesNotExist:
+            pass
+
+        try:
+            existing_package = Package.objects.get(amount=serializer.validated_data['amount'])
+            return JsonResponse({'error': 'A Package with this amount already exists.'}, status=400)
+        except Package.DoesNotExist:
+            pass
+
+        # Create a new Package object
+        serializer.save()
+        return JsonResponse(serializer.data, status=201)
+    return JsonResponse(serializer.errors, status=400)
+

@@ -74,3 +74,9 @@ class DefaultPaymentLimitsSerializer(serializers.ModelSerializer):
             'payment_limit',
             'payment_limit_period_sec',
         ]
+
+
+class PackageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Package
+        fields = '__all__'

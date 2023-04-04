@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 
 class PaymentMethods(models.IntegerChoices):
@@ -88,3 +89,14 @@ class DefaultPaymentLimits(models.Model):
 
     def __str__(self):
         return str(self.service_type_id)
+
+
+class Package(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+    amount = models.IntegerField(unique=True)
+    time_period = models.IntegerField()
+    created_date = models.DateTimeField(default=timezone.now)
+    updated_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name

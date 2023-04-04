@@ -31,7 +31,8 @@ urlpatterns = [
     path('latestpurchases/', views.get_last_payments_by_time_period),
     path('getuserpayments/<str:user>', views.get_user_payments),
     path('getdefaultlimits/', views.get_default_limits),
-    path('getuserlimits/<str:user>', views.check_payment_user_limit)
+    path('getuserlimits/<str:user>', views.check_payment_user_limit),
+    path('create_package/', views.create_package, name='create_package'),
 
 ]
 

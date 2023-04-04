@@ -1,0 +1,39 @@
+# Django Backend
+
+## Local Testing of Django (no radiusdesk or keycloak)
+To do this you will need to edit your ```settings.py``` file and then run the ```run_local_test.sh``` script. You
+settings file should look like this:
+```
+DATABASES = {
+    'default': {
+        # MySQL engine. Powered by the mysqlclient module.
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'inethi-user-management-api',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '0.0.0.0',
+        # 'HOST': 'inethi-user-management-mysql',
+        'PORT': '3316',
+    },
+    # 'radiusdeskdb': {
+    #     'NAME': 'rd',
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'USER': 'rd',
+    #     'PASSWORD': 'rd',
+    #     'HOST': 'inethi-radiusdesk-mariadb',
+    #     'PORT': '3306',
+    # }
+
+}
+```
+Run the following:
+```
+./run_local_test.sh
+```
+Then run the following in a separate terminal window:
+```
+python manage.py makemigrations inethi_management
+python manage.py migrate
+python manage.py createsuperuser
+```
+
