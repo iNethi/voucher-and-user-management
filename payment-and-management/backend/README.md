@@ -47,4 +47,7 @@ http POST http://localhost:8000/create_package/ name='Package B' amount=1010 tim
 ```
 curl -X PUT -H "Content-Type: application/json" -d '{"name": "Package 1", "amount": 100, "time_period": 30}' http://localhost:8000/edit_package/
 ```
-3. 
+3. Create default payment limit:
+```
+curl -X POST -H "Content-Type: application/json" -d '{"service_type_id": 1, "payment_method": 1, "payment_limit": 100, "payment_limit_period_sec": 3600}' http://localhost:8000/create_default_payment_limit/
+```

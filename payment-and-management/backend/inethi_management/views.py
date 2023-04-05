@@ -527,3 +527,31 @@ def edit_package(request, format=None):
         serializer.save()
         return JsonResponse(serializer.data)
     return JsonResponse(serializer.errors, status=400)
+
+
+@api_view(['POST'])
+def create_default_payment_limit(request, format=None):
+    if request.method == 'POST':
+        dic = json.load(request)
+        service_type_id = dic['service_type_id']
+        payment_method = dic['payment_method']
+        payment_limit = dic['payment_limit']
+        payment_limit_period_sec = dic['payment_limit_period_sec']
+
+        # Check if service_type_id is valid
+        try:
+            service_type = ServiceTypes.objects.get(service_type_id=service_type_id)
+        except ServiceTypes.DoesNotExist:
+            return JsonResponse(status=400, data={'error': 'Invalid service type id'})
+
+        # Check if default payment limit already exists for given service type and payment method
+        if DefaultPaymentLimits.objects.filter(service_type_id=service_type_id, payment_method=payment_method).exists():
+            return JsonResponse(status=400, data={'error': 'Default payment limit already exists for this service type and payment method'})
+
+        default_payment_limit = DefaultPaymentLimits(service_type_id=service_type_id, payment_method=payment_method,
+                                                      payment_limit=payment_limit, payment_limit_period_sec=payment_limit_period_sec)
+        default_payment_limit.save()
+
+        serializer = DefaultPaymentLimitsSerializer(default_payment_limit)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+

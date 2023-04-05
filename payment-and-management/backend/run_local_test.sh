@@ -1,7 +1,7 @@
 #!/bin/bash
-ech Have you changed the settings.py file?
-wait 2
+echo Have you changed the settings.py file?
+sleep 2
 docker-compose -f docker-compose-no-reverse-proxy.yml up -d inethi-user-management-mysql
 echo Waitng for database to come up...
-wait 15
+sleep 15
 python manage.py runserver
