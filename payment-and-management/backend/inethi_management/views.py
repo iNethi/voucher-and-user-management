@@ -3,6 +3,8 @@ from _datetime import datetime
 from datetime import timedelta
 
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+
 from .models import *
 from django.db import IntegrityError
 from .radiusdesk.models import *
@@ -11,9 +13,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 import pytz
-
-PriceToPackageMap = {"1": ["TIME30M", 1800, "1W"], "2": ["TIME1H", 3600, "2W"], "5": ["TIME24H", 10800, "1M"],
-                     "10": ["DATA1G", 2592000, "3M"]}
 
 
 @api_view(['GET'])
@@ -105,6 +104,7 @@ def purchase(request, format=None):
             service_period_sec = dic['service_period_sec']
             package = dic['package']  # description of service
             service_type = dic['service_type_id']  # registered service IDs
+
             if 'phone_num' in dic:
                 phone_num = dic['phone_num']
                 try:
@@ -175,10 +175,11 @@ def purchase(request, format=None):
                 # chosenProfile = "TIME30M"
                 # print(PriceToPackageMap)
 
-                if str(amount) in PriceToPackageMap:
+                if Package.objects.filter(amount=amount).exists():
                     # Get new voucher
-                    chosenProfile = PriceToPackageMap[str(amount)][0]
-                    service_period_sec = PriceToPackageMap[str(amount)][1]
+                    package = get_object_or_404(Package, amount=amount)
+                    chosenProfile = package.name
+                    service_period_sec = package.time_period
                     print("Profile", chosenProfile)
                     nextVoucher = Vouchers.objects.using('radiusdeskdb').filter(
                         status="new", profile=chosenProfile).filter(batch__icontains="digital").first()
@@ -248,10 +249,11 @@ def purchase(request, format=None):
             elif limit.payment_limit >= total_spent:
                 print("first elif (last payment does not exist)")
 
-                if str(amount) in PriceToPackageMap:
+                if Package.objects.filter(amount=amount).exists():
                     # Get new voucher
-                    chosenProfile = PriceToPackageMap[str(amount)][0]
-                    service_period_sec = PriceToPackageMap[str(amount)][1]
+                    package = get_object_or_404(Package, amount=amount)
+                    chosenProfile = package.name
+                    service_period_sec = package.time_period
                     print("Profile", chosenProfile)
                     nextVoucher = Vouchers.objects.using('radiusdeskdb').filter(
                         status="new", profile=chosenProfile).filter(batch__icontains="digital").first()
