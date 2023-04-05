@@ -1,5 +1,42 @@
 # Django Backend
 
+## Endpoints and Common tasks
+List of tasks that this backend can carry out and the endpoint corresponding to that task.
+
+### Create, Edit and Check Payment Limits
+Below is the user and default payment limit info.
+#### User Limits
+- Create a user limit
+- Check a user limit: '_userlimits/_'
+- Edit a user limit
+- Get all users limits: '_getuserlimits/<str:user>_'
+
+#### Default Limits
+- Create a default limit: '_create_default_payment_limit_'
+- Edit a default payment limit
+- Check default limit: '_defaultlimits/_'
+- Get all default limits: '_getdefaultlimits/_'
+
+### Payments/Purchases
+- Make a purchase: '_purchase/_'
+- Get the purchases in a time period: '_latestpurchasetimedif/_'
+
+### Payment Types
+- **TODO**
+
+### Packages
+- Create a package: '_create_package/_'
+- Edit a package: '_edit_package/_'
+
+### Services
+- Get list of services: '_services/_'
+
+### Users
+- Get users data: '_userdata/_'
+- Register a user: '_registeruser/_'
+- Get latest purchases by a user: '_latestpurchase/_'
+- Get user payments: '_getuserpayments/<str:user>_'
+
 ## Local Testing of Django (no radiusdesk or keycloak)
 To do this you will need to edit your ```settings.py``` file and then run the ```run_local_test.sh``` script. You
 settings file should look like this:

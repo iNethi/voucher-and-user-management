@@ -371,7 +371,7 @@ def request_services(request, format=None):
 
 
 @api_view(['GET'])
-def get_latest_purchase(request, format=None):
+def get_latest_purchase(request, format=None):  # TODO make this not phone number only!
     if request.method == 'GET':
         dic = json.load(request)
         service_type_id = dic['service_type_id']
@@ -388,7 +388,7 @@ def get_latest_purchase(request, format=None):
 
 
 @api_view(['GET'])
-def get_time_since_last_purchase(request, format=None):
+def get_time_since_last_purchase(request, format=None):  # TODO make this not phone number only!
     if request.method == 'GET':
         dic = json.load(request)
         service_type_id = dic['service_type_id']
@@ -428,7 +428,7 @@ def get_last_payments_by_time_period(request, format=None):
 
 
 @api_view(['GET'])
-def get_user_payments(request, user):
+def get_user_payments(request, user):  # TODO make not keycloack ID only
     if request.method == 'GET':
         keycloak_id = user
         try:
@@ -462,7 +462,7 @@ def get_default_limits(request, format=None):
 
 
 @api_view(['GET'])
-def check_payment_user_limit(request, user):
+def check_payment_user_limit(request, user):  # TODO make this not only work for Keycloak ID
     if request.method == 'GET':
         keycloak_id = user
         try:
