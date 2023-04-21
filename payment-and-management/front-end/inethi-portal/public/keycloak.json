@@ -1,0 +1,8 @@
+{
+  "realm": "master",
+  "auth-server-url": "https://keycloak.inethilocal.net/auth/",
+  "ssl-required": "external",
+  "resource": "portal",
+  "public-client": true,
+  "confidential-port": 0
+}

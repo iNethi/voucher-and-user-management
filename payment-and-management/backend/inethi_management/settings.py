@@ -86,18 +86,18 @@ DATABASES = {
         'NAME': 'inethi-user-management-api',
         'USER': 'root',
         'PASSWORD': '',
-        # 'HOST': '0.0.0.0',
-        'HOST': 'inethi-user-management-mysql',
-        'PORT': '3306',
+        'HOST': '0.0.0.0',
+        # 'HOST': 'inethi-user-management-mysql',
+        'PORT': '3316',
     },
-    'radiusdeskdb': {
-        'NAME': 'rd',
-        'ENGINE': 'django.db.backends.mysql',
-        'USER': 'rd',
-        'PASSWORD': 'rd',
-        'HOST': 'inethi-radiusdesk-mariadb',
-        'PORT': '3306',
-    }
+    # 'radiusdeskdb': {
+    #     'NAME': 'rd',
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'USER': 'rd',
+    #     'PASSWORD': 'rd',
+    #     'HOST': 'inethi-radiusdesk-mariadb',
+    #     'PORT': '3306',
+    # }
 
 }
 
