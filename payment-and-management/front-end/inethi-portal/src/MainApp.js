@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useKeycloak } from "@react-keycloak/web";
-import LoginPage from "./LoginPage";
-import HomePage from "./HomePage";
+import LoginPage from "./pages/LoginPage";
+import HomePage from "./pages/HomePage";
+import {Routes, Route} from "react-router-dom";
+import PurchaseLimits from "./pages/PurchaseLimits";
 
-function App() {
+function MainApp() {
   const [keycloakInitialized, setKeycloakInitialized] = useState(false);
   const { keycloak, initialized } = useKeycloak();
 
@@ -19,7 +21,12 @@ function App() {
     return <LoginPage />;
   }
 
-  return <HomePage />;
+  return (
+      <Routes>
+        <Route path="/" element={<HomePage/>}/>
+        <Route path="/purchase-limits" element={<PurchaseLimits/>}/>
+      </Routes>
+  );
 }
 
-export default App;
+export default MainApp;

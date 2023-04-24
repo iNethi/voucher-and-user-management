@@ -1,7 +1,11 @@
 import React from "react";
 import { useKeycloak } from "@react-keycloak/web";
-import LoginPage from "./LoginPage";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
 import MainApp from "./MainApp";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import HomePage from "./pages/HomePage";
+import PurchaseLimits from "./pages/PurchaseLimits";
 
 function App() {
   const { keycloak, initialized } = useKeycloak();
@@ -14,7 +18,14 @@ function App() {
     return <LoginPage />;
   }
 
-  return <MainApp />;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/purchase-limits" element={<PurchaseLimits />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
