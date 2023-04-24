@@ -9,9 +9,8 @@ function HomePage() {
 
   return (
     <div className="homepage-container">
-      <div className="homepage-navbar">
+      <div>
         <Navigation/>
-
       </div>
       <div className="homepage-content">
         <h1>Welcome, {keycloak.authenticated && keycloak.tokenParsed.preferred_username}!</h1>

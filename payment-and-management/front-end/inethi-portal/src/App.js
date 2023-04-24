@@ -6,6 +6,7 @@ import MainApp from "./MainApp";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import HomePage from "./pages/HomePage";
 import PurchaseLimits from "./pages/PurchaseLimits";
+import Purchase from "./pages/Purchase";
 
 function App() {
   const { keycloak, initialized } = useKeycloak();
@@ -23,6 +24,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/purchase-limits" element={<PurchaseLimits />} />
+        <Route path="/purchases" element={<Purchase />} />
       </Routes>
     </BrowserRouter>
   );
