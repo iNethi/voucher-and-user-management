@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ReactKeycloakProvider } from '@react-keycloak/web';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import keycloak from './keycloak';
 import { BrowserRouter } from 'react-router-dom';
 

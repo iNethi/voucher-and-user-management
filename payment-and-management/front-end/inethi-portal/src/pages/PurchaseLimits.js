@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Navigation from "../Components/Navigation/Navigation";
 import axios from "axios";
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 axios.defaults.baseURL = 'http://0.0.0.0:8000';
 
 function PurchaseLimits() {
+  const [showModal, setShowModal] = useState(false);
+  const [responseMessage, setResponseMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null);
   const [services, setServices] = useState([]);
   const [limits, setLimits] = useState([]);
   const [paymentMethods, setPaymentMethods] = useState({});
@@ -14,12 +19,17 @@ function PurchaseLimits() {
     payment_limit: '',
     payment_limit_period_sec: '',
   });
+  const [newLimitData, setNewLimitData] = useState({
+    service_type_id: '',
+    payment_method: '',
+    payment_limit: '',
+    payment_limit_period_sec: '',
+  });
 
   useEffect(() => {
     // Fetch services
     axios.get('/services/')
       .then(response => {
-        console.log(response.data);
         setServices(response.data);
       })
       .catch(error => {
@@ -58,7 +68,14 @@ function PurchaseLimits() {
 
   const handleInputChange = e => {
     setEditData({
-      ...editData,
+      ...editData, // create a new object with the same properties as an existing object
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleNewLimitInputChange = e => {
+    setNewLimitData({
+      ...newLimitData,
       [e.target.name]: e.target.value,
     });
   };
@@ -75,9 +92,34 @@ function PurchaseLimits() {
           payment_limit: '',
           payment_limit_period_sec: '',
         });
+      setResponseMessage(`Successfully updated limit with ID: ${updatedLimit.id}`);
+    setShowModal(true);
+  })
+  .catch(error => {
+    console.error(`Error updating default payment limit: ${error}`);
+    setErrorMessage(`Error updating default payment limit: ${error}`);
+        setShowModal(true);
+  });
+  };
+
+  const createNewLimit = e => {
+    e.preventDefault();
+    axios.post('/create_default_payment_limit/', newLimitData)
+      .then(response => {
+        setLimits([...limits, response.data]);
+        setNewLimitData({
+          service_type_id: '',
+          payment_method: '',
+          payment_limit: '',
+          payment_limit_period_sec: '',
+        });
+        setResponseMessage(`Successfully created limit`);
+    setShowModal(true);
       })
       .catch(error => {
-        console.error(`Error updating default payment limit: ${error}`);
+        console.error(`Error creating new limit: ${error}`);
+        setErrorMessage(`Error creating new limit: ${error}`);
+        setShowModal(true);
       });
   };
 
@@ -88,6 +130,42 @@ function PurchaseLimits() {
       </div>
       <div className="homepage-content">
         <h1>Default Purchase Limits</h1>
+        <div>
+          <h2>Create New Limit</h2>
+          <form onSubmit={createNewLimit}>
+            <label>
+              Service Type ID:
+              <select name="service_type_id" value={newLimitData.service_type_id} onChange={handleNewLimitInputChange}>
+                <option value="">Select a service type</option>
+                {services.map((service, index) => (
+                  <option value={service.service_type_id} key={index}>
+                    {service.service_type_id} - {service.description}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Payment Method:
+              <select name="payment_method" value={newLimitData.payment_method} onChange={handleNewLimitInputChange}>
+                <option value="">Select a payment method</option>
+                {Object.entries(paymentMethods).map(([key, value], index) => (
+                  <option value={key} key={index}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Payment Limit:
+              <input name="payment_limit" type="number" value={newLimitData.payment_limit} onChange={handleNewLimitInputChange} required />
+            </label>
+            <label>
+              Payment Limit Period (sec):
+              <input name="payment_limit_period_sec" type="number" value={newLimitData.payment_limit_period_sec} onChange={handleNewLimitInputChange} required />
+            </label>
+            <button type="submit">Create New Limit</button>
+          </form>
+        </div>
         <ul>
           {limits.map((limit, index) => {
             const relatedService = services.find(service => service.service_type_id === limit.service_type_id);
@@ -106,16 +184,50 @@ function PurchaseLimits() {
           })}
         </ul>
         {editLimit && (
-          <div>
-            <h2>Edit Limit</h2>
-            <label>Service Type ID: <input name="service_type_id" value={editData.service_type_id} onChange={handleInputChange} /></label>
-            <label>Payment Method: <input name="payment_method" value={editData.payment_method} onChange={handleInputChange} /></label>
-            <label>Payment Limit: <input name="payment_limit" value={editData.payment_limit} onChange={handleInputChange} /></label>
-            <label>Payment Limit Period (sec): <input name="payment_limit_period_sec" value={editData.payment_limit_period_sec} onChange={handleInputChange} /></label>
-            <button onClick={save}>Save</button>
-          </div>
-        )}
+  <div className="card">
+    <h2>Edit Limit</h2>
+    <form>
+      <label>
+        Service Type ID:
+        <input name="service_type_id" value={editData.service_type_id} readOnly />
+      </label>
+      <label>
+        Payment Method:
+        <input name="payment_method" value={editData.payment_method} readOnly />
+      </label>
+      <label>
+        Payment Limit:
+        <input name="payment_limit" type="number" value={editData.payment_limit} onChange={handleInputChange} required />
+      </label>
+      <label>
+        Payment Limit Period (sec):
+        <input name="payment_limit_period_sec" type="number" value={editData.payment_limit_period_sec} onChange={handleInputChange} required />
+      </label>
+      <button type="button" onClick={save}>Save</button>
+    </form>
+  </div>
+)}
+
       </div>
+      {showModal && (
+  <div className="modal show d-block" tabIndex="-1">
+    <div className="modal-dialog">
+      <div className="modal-content">
+        <div className="modal-header">
+          <h5 className="modal-title">Response Message</h5>
+          <button type="button" className="btn-close" onClick={() => {setShowModal(false); setErrorMessage(null);}}></button>
+        </div>
+        <div className="modal-body">
+          <p>{errorMessage ? errorMessage : responseMessage}</p>
+        </div>
+        <div className="modal-footer">
+          <button type="button" className="btn btn-secondary" onClick={() => {setShowModal(false); setErrorMessage(null);}}>Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
