@@ -7,7 +7,9 @@ function Purchase() {
         <div className>
             <Navigation/>
         </div>
-        <p>This is the purchases page</p>
+        <div className="homepage-content">
+            <p>This is the purchases page</p>
+        </div>
     </div>
   );
 }

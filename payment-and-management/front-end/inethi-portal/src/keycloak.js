@@ -1,10 +1,10 @@
 import Keycloak from 'keycloak-js';
 
 const keycloak = new Keycloak({
+  onLoad: 'login-required',
   url: 'https://keycloak.inethilocal.net/auth',
-  realm: 'Master',
-  clientId: 'portal',
-  useRedirects: true, // Set this property to true
+  realm: 'master',
+  clientId: 'portal-local',
 });
 
 export default keycloak;

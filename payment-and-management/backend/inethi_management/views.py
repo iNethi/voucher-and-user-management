@@ -16,6 +16,12 @@ import pytz
 
 
 @api_view(['GET'])
+def get_payment_methods(request):
+    choices = dict(PaymentMethods.choices)
+    return JsonResponse(choices)
+
+
+@api_view(['GET'])
 def check_payment_user_limit(request, format=None):
     if request.method == 'GET':
         try:
@@ -546,12 +552,13 @@ def create_default_payment_limit(request, format=None):
 
         # Check if default payment limit already exists for given service type and payment method
         if DefaultPaymentLimits.objects.filter(service_type_id=service_type_id, payment_method=payment_method).exists():
-            return JsonResponse(status=400, data={'error': 'Default payment limit already exists for this service type and payment method'})
+            return JsonResponse(status=400, data={
+                'error': 'Default payment limit already exists for this service type and payment method'})
 
         default_payment_limit = DefaultPaymentLimits(service_type_id=service_type_id, payment_method=payment_method,
-                                                      payment_limit=payment_limit, payment_limit_period_sec=payment_limit_period_sec)
+                                                     payment_limit=payment_limit,
+                                                     payment_limit_period_sec=payment_limit_period_sec)
         default_payment_limit.save()
 
         serializer = DefaultPaymentLimitsSerializer(default_payment_limit)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
