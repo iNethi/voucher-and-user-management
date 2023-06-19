@@ -92,7 +92,8 @@ function PurchaseLimits() {
           payment_limit: '',
           payment_limit_period_sec: '',
         });
-      setResponseMessage(`Successfully updated limit with ID: ${updatedLimit.id}`);
+        console.log(updatedLimit)
+      setResponseMessage(`Successfully updated limit.`);
     setShowModal(true);
   })
   .catch(error => {
@@ -102,10 +103,11 @@ function PurchaseLimits() {
   });
   };
 
-  const createNewLimit = e => {
-    e.preventDefault();
-    axios.post('/create_default_payment_limit/', newLimitData)
-      .then(response => {
+const createNewLimit = e => {
+  e.preventDefault();
+  axios.post('/create_default_payment_limit/', newLimitData)
+    .then(response => {
+      if (response.status >= 200 && response.status < 300) {
         setLimits([...limits, response.data]);
         setNewLimitData({
           service_type_id: '',
@@ -114,14 +116,23 @@ function PurchaseLimits() {
           payment_limit_period_sec: '',
         });
         setResponseMessage(`Successfully created limit`);
-    setShowModal(true);
-      })
-      .catch(error => {
-        console.error(`Error creating new limit: ${error}`);
-        setErrorMessage(`Error creating new limit: ${error}`);
         setShowModal(true);
-      });
-  };
+      } else {
+        throw Error('Server responded with an error status');
+      }
+    })
+    .catch(error => {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        setErrorMessage(`ERROR: ${error.response.data.error}`);
+        setShowModal(true);
+      } else {
+        // Something happened in setting up the request and triggered an Error
+        console.error(`Error creating new limit: ${error.message}`);
+      }
+    });
+};
 
   return (
     <div className="homepage-container">
@@ -131,6 +142,48 @@ function PurchaseLimits() {
       <div className="homepage-content">
         <h1>Default Purchase Limits</h1>
         <div>
+          <h2>Default Limits</h2>
+        <ul>
+          {limits.map((limit, index) => {
+            const relatedService = services.find(service => service.service_type_id === limit.service_type_id);
+
+            return (
+              <li key={index}>
+                Service Type ID: {limit.service_type_id},
+                Service Description: {relatedService ? relatedService.description : 'Not found'},
+                Payment Method ID: {limit.payment_method},
+                Payment Method: {paymentMethods[limit.payment_method]},
+                Payment Limit: {limit.payment_limit},
+                Payment Limit Period (sec): {limit.payment_limit_period_sec}
+                <button onClick={() => edit(limit)}>Edit</button>
+              </li>
+            );
+          })}
+        </ul>
+          {editLimit && (
+  <div className="card">
+    <h2>Edit Limit</h2>
+    <form>
+      <label>
+        Service Type ID:
+        <input name="service_type_id" value={editData.service_type_id} readOnly />
+      </label>
+      <label>
+        Payment Method:
+        <input name="payment_method" value={editData.payment_method} readOnly />
+      </label>
+      <label>
+        Payment Limit:
+        <input name="payment_limit" type="number" value={editData.payment_limit} onChange={handleInputChange} required />
+      </label>
+      <label>
+        Payment Limit Period (sec):
+        <input name="payment_limit_period_sec" type="number" value={editData.payment_limit_period_sec} onChange={handleInputChange} required />
+      </label>
+      <button type="button" onClick={save}>Save</button>
+    </form>
+  </div>
+)}
           <h2>Create New Limit</h2>
           <form onSubmit={createNewLimit}>
             <label>
@@ -166,47 +219,8 @@ function PurchaseLimits() {
             <button type="submit">Create New Limit</button>
           </form>
         </div>
-        <ul>
-          {limits.map((limit, index) => {
-            const relatedService = services.find(service => service.service_type_id === limit.service_type_id);
 
-            return (
-              <li key={index}>
-                Service Type ID: {limit.service_type_id},
-                Service Description: {relatedService ? relatedService.description : 'Not found'},
-                Payment Method ID: {limit.payment_method},
-                Payment Method: {paymentMethods[limit.payment_method]},
-                Payment Limit: {limit.payment_limit},
-                Payment Limit Period (sec): {limit.payment_limit_period_sec}
-                <button onClick={() => edit(limit)}>Edit</button>
-              </li>
-            );
-          })}
-        </ul>
-        {editLimit && (
-  <div className="card">
-    <h2>Edit Limit</h2>
-    <form>
-      <label>
-        Service Type ID:
-        <input name="service_type_id" value={editData.service_type_id} readOnly />
-      </label>
-      <label>
-        Payment Method:
-        <input name="payment_method" value={editData.payment_method} readOnly />
-      </label>
-      <label>
-        Payment Limit:
-        <input name="payment_limit" type="number" value={editData.payment_limit} onChange={handleInputChange} required />
-      </label>
-      <label>
-        Payment Limit Period (sec):
-        <input name="payment_limit_period_sec" type="number" value={editData.payment_limit_period_sec} onChange={handleInputChange} required />
-      </label>
-      <button type="button" onClick={save}>Save</button>
-    </form>
-  </div>
-)}
+
 
       </div>
       {showModal && (
