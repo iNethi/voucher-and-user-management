@@ -36,6 +36,7 @@ urlpatterns = [
     path('edit_package/', views.edit_package, name='edit_package'),
     path('create_default_payment_limit/', views.create_default_payment_limit, name='create_default_payment_limit'),
     path('payment-methods/', views.get_payment_methods, name='payment-methods'),
+    path('update_default_payment_limit/', views.update_default_payment_limit, name='update_default_payment_limit'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -7,6 +7,13 @@ function PurchaseLimits() {
   const [services, setServices] = useState([]);
   const [limits, setLimits] = useState([]);
   const [paymentMethods, setPaymentMethods] = useState({});
+  const [editLimit, setEditLimit] = useState(null);
+  const [editData, setEditData] = useState({
+    service_type_id: '',
+    payment_method: '',
+    payment_limit: '',
+    payment_limit_period_sec: '',
+  });
 
   useEffect(() => {
     // Fetch services
@@ -39,6 +46,41 @@ function PurchaseLimits() {
 
   }, []);
 
+  const edit = limit => {
+    setEditLimit(limit);
+    setEditData({
+      service_type_id: limit.service_type_id,
+      payment_method: limit.payment_method,
+      payment_limit: limit.payment_limit,
+      payment_limit_period_sec: limit.payment_limit_period_sec,
+    });
+  };
+
+  const handleInputChange = e => {
+    setEditData({
+      ...editData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const save = () => {
+    axios.put('/update_default_payment_limit/', editData)
+      .then(response => {
+        const updatedLimit = response.data;
+        setLimits(limits.map(limit => limit === editLimit ? updatedLimit : limit));
+        setEditLimit(null);
+        setEditData({
+          service_type_id: '',
+          payment_method: '',
+          payment_limit: '',
+          payment_limit_period_sec: '',
+        });
+      })
+      .catch(error => {
+        console.error(`Error updating default payment limit: ${error}`);
+      });
+  };
+
   return (
     <div className="homepage-container">
       <div>
@@ -58,10 +100,21 @@ function PurchaseLimits() {
                 Payment Method: {paymentMethods[limit.payment_method]},
                 Payment Limit: {limit.payment_limit},
                 Payment Limit Period (sec): {limit.payment_limit_period_sec}
+                <button onClick={() => edit(limit)}>Edit</button>
               </li>
             );
           })}
         </ul>
+        {editLimit && (
+          <div>
+            <h2>Edit Limit</h2>
+            <label>Service Type ID: <input name="service_type_id" value={editData.service_type_id} onChange={handleInputChange} /></label>
+            <label>Payment Method: <input name="payment_method" value={editData.payment_method} onChange={handleInputChange} /></label>
+            <label>Payment Limit: <input name="payment_limit" value={editData.payment_limit} onChange={handleInputChange} /></label>
+            <label>Payment Limit Period (sec): <input name="payment_limit_period_sec" value={editData.payment_limit_period_sec} onChange={handleInputChange} /></label>
+            <button onClick={save}>Save</button>
+          </div>
+        )}
       </div>
     </div>
   );

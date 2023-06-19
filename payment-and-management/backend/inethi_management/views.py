@@ -562,3 +562,36 @@ def create_default_payment_limit(request, format=None):
 
         serializer = DefaultPaymentLimitsSerializer(default_payment_limit)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+@api_view(['PUT'])
+def update_default_payment_limit(request, format=None):
+    if request.method == 'PUT':
+        try:
+            service_type_id = request.data['service_type_id']
+            payment_method = request.data['payment_method']
+            payment_limit = request.data['payment_limit']
+            payment_limit_period_sec = request.data['payment_limit_period_sec']
+
+            # Check if service_type_id is valid
+            try:
+                service_type = ServiceTypes.objects.get(service_type_id=service_type_id)
+            except ServiceTypes.DoesNotExist:
+                return JsonResponse(status=400, data={'error': 'Invalid service type id'})
+
+            # Check if default payment limit exists for given service type and payment method
+            try:
+                limit = DefaultPaymentLimits.objects.get(service_type_id=service_type_id, payment_method=payment_method)
+            except DefaultPaymentLimits.DoesNotExist:
+                return JsonResponse(status=404, data={
+                    'error': 'Default payment limit does not exist for this service type and payment method'})
+
+            limit.payment_limit = payment_limit
+            limit.payment_limit_period_sec = payment_limit_period_sec
+            limit.save()
+
+            serializer = DefaultPaymentLimitsSerializer(limit)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(e)
+            return JsonResponse(status=400, data={'error': 'Bad Request'})
