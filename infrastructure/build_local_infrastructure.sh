@@ -29,3 +29,6 @@ echo "Setting up Keycloak"
 cd ./keycloak || exit 1
 ./build.sh || exit 1
 cd .. || exit 1
+cd ./mysql || exit 1
+./build.sh || exit 1
+echo "We are all done."

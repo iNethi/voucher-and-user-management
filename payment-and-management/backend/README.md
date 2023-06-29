@@ -1,5 +1,41 @@
 # Django Backend
 
+## Running this Code
+### Testing (No RadiusDesk)
+1. To do this you will need to edit your ```settings.py```::
+```
+DATABASES = {
+    'default': {
+        # MySQL engine. Powered by the mysqlclient module.
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'inethi-user-management-api',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '0.0.0.0',
+        # 'HOST': 'inethi-user-management-mysql',
+        'PORT': '3316',
+    },
+    # 'radiusdeskdb': {
+    #     'NAME': 'rd',
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'USER': 'rd',
+    #     'PASSWORD': 'rd',
+    #     'HOST': 'inethi-radiusdesk-mariadb',
+    #     'PORT': '3306',
+    # }
+
+}
+```
+2. Start a mysql database, traefik instance and keycloak instance. This code is provided for you and explained in this 
+[file](../../infrastructure/README.md).
+3. Start the backend from the backend directory in this repo
+   1. python manage.py makemigrations
+   2. python manage.py migrate
+   3. python manage.py runserver
+   4. python manage.py create_dummy_data
+   5. python manage.py createsuperuser
+4. Start the frontend
+
 ## Endpoints and Common tasks
 List of tasks that this backend can carry out and the endpoint corresponding to that task.
 
@@ -36,55 +72,3 @@ Below is the user and default payment limit info.
 - Register a user: '_registeruser/_'
 - Get latest purchases by a user: '_latestpurchase/_'
 - Get user payments: '_getuserpayments/<str:user>_'
-
-## Local Testing of Django (no radiusdesk or keycloak)
-To do this you will need to edit your ```settings.py``` file and then run the ```run_local_test.sh``` script. You
-settings file should look like this:
-```
-DATABASES = {
-    'default': {
-        # MySQL engine. Powered by the mysqlclient module.
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'inethi-user-management-api',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '0.0.0.0',
-        # 'HOST': 'inethi-user-management-mysql',
-        'PORT': '3316',
-    },
-    # 'radiusdeskdb': {
-    #     'NAME': 'rd',
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'USER': 'rd',
-    #     'PASSWORD': 'rd',
-    #     'HOST': 'inethi-radiusdesk-mariadb',
-    #     'PORT': '3306',
-    # }
-
-}
-```
-Run the following:
-```
-./run_local_test.sh
-```
-Then run the following in a separate terminal window:
-```
-python manage.py makemigrations inethi_management
-python manage.py migrate
-python manage.py createsuperuser
-```
-
-
-## Terminal Endpoint Testing
-1. Create a package
-```
-http POST http://localhost:8000/create_package/ name='Package B' amount=1010 time_period=30
-```
-2. Edit a package
-```
-curl -X PUT -H "Content-Type: application/json" -d '{"name": "Package 1", "amount": 100, "time_period": 30}' http://localhost:8000/edit_package/
-```
-3. Create default payment limit:
-```
-curl -X POST -H "Content-Type: application/json" -d '{"service_type_id": 1, "payment_method": 1, "payment_limit": 100, "payment_limit_period_sec": 3600}' http://localhost:8000/create_default_payment_limit/
-```
