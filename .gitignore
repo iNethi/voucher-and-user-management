@@ -6,3 +6,5 @@ venv
 /payment-and-management/backend/inethi_management/migrations/
 /payment-and-management/backend/inethi_management_app/migrations/
 /infrastructure/keycloak/keycloak-mysql/
+/payment-and-management/backend/inethi_management/.env
+/payment-and-management/backend/inethi_management/.do_not_commit
