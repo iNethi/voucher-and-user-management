@@ -1,5 +1,10 @@
 # iNethi ft. User management and Voucher
-An user management portal for iNethi
+A user management portal for iNethi
+
+## Running this code
+This code should be set up and run via the iNehti GUI Installer unless you are wanting to work on the code in
+a dev or custom capacity. For this type of work, follow the instructions in the README 
+[here](./payment-and-management/backend/README.md)
 
 ## Setting up
 To set up **_Keycloak_** to allow users to log in to the front end follow these steps:
