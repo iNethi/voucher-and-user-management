@@ -1,2 +1,5 @@
 /payment-and-management/backend/data/
-data/
+infrastructure/mysql/data/
+payment-and-management/front-end/inethi-portal/node_modules
+venv
+.idea
