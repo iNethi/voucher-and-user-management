@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-
+from django.core.exceptions import ObjectDoesNotExist
 from .models import *
 from django.db import IntegrityError
 from .radiusdesk.models import *
@@ -595,3 +595,21 @@ def update_default_payment_limit(request, format=None):
         except Exception as e:
             print(e)
             return JsonResponse(status=400, data={'error': 'Bad Request'})
+
+@api_view(['POST'])
+def create_service_type(request):
+    service_type_id = request.data.get('service_type_id')
+    description = request.data.get('description')
+    pay_type = request.data.get('pay_type')
+
+    # Check if a ServiceType with the provided service_type_id already exists
+    try:
+        service_type = ServiceTypes.objects.get(service_type_id=service_type_id)
+        return Response({"message": "ServiceType with this service_type_id already exists."}, status=status.HTTP_400_BAD_REQUEST)
+    except ObjectDoesNotExist:
+        # If it doesn't exist, create a new one
+        new_service_type = ServiceTypes(service_type_id=service_type_id, description=description, pay_type=pay_type)
+        new_service_type.save()
+
+        serializer = ServiceTypesSerializer(new_service_type)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

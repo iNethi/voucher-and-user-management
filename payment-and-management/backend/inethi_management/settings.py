@@ -35,7 +35,7 @@ CORS_ORIGIN_ALLOW_ALL = DEBUG
 
 INSTALLED_APPS = [
     'rest_framework',
-    'inethi_management',
+    'inethi_management_app',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -101,7 +101,7 @@ DATABASES = {
 
 }
 
-DATABASE_ROUTERS = ['inethi_management.radiusdesk.router.RadiusDeskRouter']
+DATABASE_ROUTERS = ['inethi_management_app.radiusdesk.router.RadiusDeskRouter']
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

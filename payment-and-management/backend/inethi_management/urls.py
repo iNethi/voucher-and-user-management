@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from . import views
+from inethi_management_app import views
 from rest_framework.urlpatterns import format_suffix_patterns
 # test
 urlpatterns = [
@@ -37,6 +37,7 @@ urlpatterns = [
     path('create_default_payment_limit/', views.create_default_payment_limit, name='create_default_payment_limit'),
     path('payment-methods/', views.get_payment_methods, name='payment-methods'),
     path('update_default_payment_limit/', views.update_default_payment_limit, name='update_default_payment_limit'),
+    path('create-service-type/', views.create_service_type),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -1,0 +1,11 @@
+version: '3'
+services:
+  db:
+    image: mysql
+    environment:
+      MYSQL_DATABASE: 'inethi-user-management-api'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
+    volumes:
+      - ./data:/var/lib/mysql
+    ports:
+      - "3316:3306"
