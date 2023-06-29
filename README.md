@@ -1,5 +1,5 @@
 # iNethi ft. User management and Voucher
-A user management portal for iNethi
+A user management portal for iNethi that uses React and Django.
 
 ## Running this code
 This code should be set up and run via the iNehti GUI Installer unless you are wanting to work on the code in
