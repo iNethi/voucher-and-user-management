@@ -3,3 +3,6 @@ infrastructure/mysql/data/
 payment-and-management/front-end/inethi-portal/node_modules
 venv
 .idea
+/payment-and-management/backend/inethi_management/migrations/
+/payment-and-management/backend/inethi_management_app/migrations/
+/infrastructure/keycloak/keycloak-mysql/
