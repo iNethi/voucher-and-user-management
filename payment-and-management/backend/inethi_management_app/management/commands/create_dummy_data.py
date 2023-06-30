@@ -16,6 +16,9 @@ fake = Faker()
 fake.date_time_this_year(before_now=True, after_now=False, tzinfo=timezone.utc)
 
 class Command(BaseCommand):
+    """
+    this will create various randomised data for testing. IDs will be incorrect for services TODO fix this
+    """
     help = 'Create random users'
 
     def create_service_types(self):
@@ -46,6 +49,10 @@ class Command(BaseCommand):
             )
 
     def create_payments(self):
+        """
+        this will genereate payments but the service ID will be incorrect
+        :return:
+        """
         for _ in range(5):
             Payment.objects.create(
                 user_id=Users.objects.order_by('?').first(),
@@ -69,6 +76,7 @@ class Command(BaseCommand):
                 misc1=fake.text(max_nb_chars=50),
                 misc2=fake.text(max_nb_chars=50),
             )
+
 
     def create_default_payment_limits(self):
         for _ in range(5):
