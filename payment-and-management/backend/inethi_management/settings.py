@@ -11,10 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-from dotenv import load_dotenv
-import os
 
-load_dotenv()  # take environment variables from .env.
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,15 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'django-keycloak-auth',
 ]
-KEYCLOAK_EXEMPT_URIS = []
-KEYCLOAK_CONFIG = {
-    'KEYCLOAK_SERVER_URL': 'https://keycloak.inethilocal.net/auth',
-    'KEYCLOAK_REALM': 'master',
-    'KEYCLOAK_CLIENT_ID': 'portal-local',
-    'KEYCLOAK_CLIENT_SECRET_KEY': os.getenv('KEYCLOAK_CLIENT_SECRET_KEY')
-}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -65,7 +55,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django-keycloak-auth.middleware.KeycloakMiddleware',
 ]
 
 ROOT_URLCONF = 'inethi_management.urls'
@@ -85,10 +74,7 @@ TEMPLATES = [
         },
     },
 ]
-AUTHENTICATION_BACKENDS = [
-    'django_keycloak.auth.backends.KeycloakAuthorizationBackend',
 
-]
 
 WSGI_APPLICATION = 'inethi_management.wsgi.application'
 
