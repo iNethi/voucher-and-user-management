@@ -620,6 +620,16 @@ def update_default_payment_limit(request, format=None):
 
 @api_view(['POST'])
 def create_service_type(request):
+    data = json.loads(request.body)
+    token = data.get('token')
+    try:
+        userinfo = keycloak_openid.userinfo(token)
+        print(userinfo)
+        if userinfo['preferred_username'] != 'inethi':
+            return HttpResponse('Unauthorized', status=401)
+    except Exception as e:
+        print(e)
+        return HttpResponse('Unauthorized', status=401)
     service_type_id = request.data.get('service_type_id')
     description = request.data.get('description')
     pay_type = request.data.get('pay_type')
