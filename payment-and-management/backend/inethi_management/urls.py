@@ -38,6 +38,7 @@ urlpatterns = [
     path('payment-methods/', views.get_payment_methods, name='payment-methods'),
     path('update_default_payment_limit/', views.update_default_payment_limit, name='update_default_payment_limit'),
     path('create-service-type/', views.create_service_type),
+    path('get-user-from-token/', views.get_user_from_token),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

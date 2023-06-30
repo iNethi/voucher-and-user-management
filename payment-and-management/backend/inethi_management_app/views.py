@@ -2,7 +2,7 @@ import json
 from _datetime import datetime
 from datetime import timedelta
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from .models import *
@@ -13,12 +13,32 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 import pytz
+from keycloak import KeycloakOpenID
 
 
 @api_view(['GET'])
 def get_payment_methods(request):
     choices = dict(PaymentMethods.choices)
     return JsonResponse(choices)
+
+
+keycloak_openid = KeycloakOpenID(
+    server_url="https://keycloak.inethilocal.net/auth/",
+    client_id="portal-local",
+    realm_name="master",
+)
+
+@api_view(['POST'])
+def get_user_from_token(request):
+    data = json.loads(request.body)
+    token = data.get('token')
+    try:
+        user = keycloak_openid.userinfo(token)
+        print(user)
+        return Response(user, status=status.HTTP_200_OK)
+    except Exception as e:
+        print(e)
+        return HttpResponse('Unauthorized', status=401)
 
 
 @api_view(['GET'])
@@ -563,6 +583,7 @@ def create_default_payment_limit(request, format=None):
         serializer = DefaultPaymentLimitsSerializer(default_payment_limit)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
 @api_view(['PUT'])
 def update_default_payment_limit(request, format=None):
     if request.method == 'PUT':
@@ -596,6 +617,7 @@ def update_default_payment_limit(request, format=None):
             print(e)
             return JsonResponse(status=400, data={'error': 'Bad Request'})
 
+
 @api_view(['POST'])
 def create_service_type(request):
     service_type_id = request.data.get('service_type_id')
@@ -605,7 +627,8 @@ def create_service_type(request):
     # Check if a ServiceType with the provided service_type_id already exists
     try:
         service_type = ServiceTypes.objects.get(service_type_id=service_type_id)
-        return Response({"message": "ServiceType with this service_type_id already exists."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "ServiceType with this service_type_id already exists."},
+                        status=status.HTTP_400_BAD_REQUEST)
     except ObjectDoesNotExist:
         # If it doesn't exist, create a new one
         new_service_type = ServiceTypes(service_type_id=service_type_id, description=description, pay_type=pay_type)
