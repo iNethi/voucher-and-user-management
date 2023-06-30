@@ -558,6 +558,16 @@ def edit_package(request, format=None):
 @api_view(['POST'])
 def create_default_payment_limit(request, format=None):
     if request.method == 'POST':
+        data = json.loads(request.body)
+        token = data.get('token')
+        try:
+            userinfo = keycloak_openid.userinfo(token)
+            print(userinfo)
+            if userinfo['preferred_username'] != 'inethi':
+                return HttpResponse('Unauthorized', status=401)
+        except Exception as e:
+            print(e)
+            return HttpResponse('Unauthorized', status=401)
         dic = json.load(request)
         service_type_id = dic['service_type_id']
         payment_method = dic['payment_method']
@@ -588,6 +598,16 @@ def create_default_payment_limit(request, format=None):
 def update_default_payment_limit(request, format=None):
     if request.method == 'PUT':
         try:
+            data = json.loads(request.body)
+            token = data.get('token')
+            try:
+                userinfo = keycloak_openid.userinfo(token)
+                print(userinfo)
+                if userinfo['preferred_username'] != 'inethi':
+                    return HttpResponse('Unauthorized', status=401)
+            except Exception as e:
+                print(e)
+                return HttpResponse('Unauthorized', status=401)
             service_type_id = request.data['service_type_id']
             payment_method = request.data['payment_method']
             payment_limit = request.data['payment_limit']
@@ -597,6 +617,7 @@ def update_default_payment_limit(request, format=None):
             try:
                 service_type = ServiceTypes.objects.get(service_type_id=service_type_id)
             except ServiceTypes.DoesNotExist:
+                print('error: Invalid service type id')
                 return JsonResponse(status=400, data={'error': 'Invalid service type id'})
 
             # Check if default payment limit exists for given service type and payment method

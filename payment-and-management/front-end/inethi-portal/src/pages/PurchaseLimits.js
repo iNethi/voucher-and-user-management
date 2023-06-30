@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import Navigation from "../Components/Navigation/Navigation";
 import axios from "axios";
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import {useKeycloak} from "@react-keycloak/web";
 axios.defaults.baseURL = 'http://0.0.0.0:8000';
 
 function PurchaseLimits() {
+  const { keycloak } = useKeycloak();
   const [showModal, setShowModal] = useState(false);
   const [responseMessage, setResponseMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
@@ -81,7 +82,11 @@ function PurchaseLimits() {
   };
 
   const save = () => {
-    axios.put('/update_default_payment_limit/', editData)
+    const editDataWithToken = {
+    ...editData,
+    token: keycloak.token,  // append token to formData
+  };
+    axios.put('/update_default_payment_limit/', editDataWithToken)
       .then(response => {
         const updatedLimit = response.data;
         setLimits(limits.map(limit => limit === editLimit ? updatedLimit : limit));
@@ -97,15 +102,20 @@ function PurchaseLimits() {
     setShowModal(true);
   })
   .catch(error => {
-    console.error(`Error updating default payment limit: ${error}`);
-    setErrorMessage(`Error updating default payment limit: ${error}`);
-        setShowModal(true);
+    console.error(`Error updating default payment limit: ${error.response.data.error}`);
+setErrorMessage(`Error updating default payment limit: ${error.response.data.error}`);
+setShowModal(true);
+
   });
   };
 
 const createNewLimit = e => {
   e.preventDefault();
-  axios.post('/create_default_payment_limit/', newLimitData)
+  const newLimitDataWithToken = {
+    ...newLimitData,
+    token: keycloak.token,  // append token to formData
+  };
+  axios.post('/create_default_payment_limit/', newLimitDataWithToken)
     .then(response => {
       if (response.status >= 200 && response.status < 300) {
         setLimits([...limits, response.data]);
@@ -155,7 +165,9 @@ const createNewLimit = e => {
                 Payment Method: {paymentMethods[limit.payment_method]},
                 Payment Limit: {limit.payment_limit},
                 Payment Limit Period (sec): {limit.payment_limit_period_sec}
-                <button onClick={() => edit(limit)}>Edit</button>
+                {(keycloak.tokenParsed && keycloak.tokenParsed.preferred_username === 'inethi') && (
+        <button onClick={() => edit(limit)}>Edit</button>
+      )}
               </li>
             );
           })}
@@ -184,6 +196,8 @@ const createNewLimit = e => {
     </form>
   </div>
 )}
+          {(keycloak.tokenParsed && keycloak.tokenParsed.preferred_username === 'inethi') && (
+<div>
           <h2>Create New Limit</h2>
           <form onSubmit={createNewLimit}>
             <label>
@@ -218,6 +232,9 @@ const createNewLimit = e => {
             </label>
             <button type="submit">Create New Limit</button>
           </form>
+  </div>
+)}
+
         </div>
 
 
