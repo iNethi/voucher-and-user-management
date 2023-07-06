@@ -33,12 +33,13 @@ urlpatterns = [
     path('getdefaultlimits/', views.get_default_limits),
     path('getuserlimits/<str:user>', views.check_payment_user_limit),
     path('create_package/', views.create_package, name='create_package'),
-    path('edit_package/', views.edit_package, name='edit_package'),
+    path('edit_package/<int:package_id>/', views.edit_package),
     path('create_default_payment_limit/', views.create_default_payment_limit, name='create_default_payment_limit'),
     path('payment-methods/', views.get_payment_methods, name='payment-methods'),
     path('update_default_payment_limit/', views.update_default_payment_limit, name='update_default_payment_limit'),
     path('create-service-type/', views.create_service_type),
     path('get-user-from-token/', views.get_user_from_token),
+    path('get-packages/', views.get_package),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

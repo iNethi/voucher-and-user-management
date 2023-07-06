@@ -28,6 +28,7 @@ keycloak_openid = KeycloakOpenID(
     realm_name="master",
 )
 
+
 @api_view(['POST'])
 def get_user_from_token(request):
     data = json.loads(request.body)
@@ -525,27 +526,47 @@ def create_package(request, format=None):
     return JsonResponse(serializer.errors, status=400)
 
 
+@api_view(['GET'])
+def get_package(request, format=None):
+    if request.method == 'GET':
+        try:
+            packages = Package.objects.all()
+            serializer = PackageSerializer(packages, many=True)  # assuming you have a serializer for the Package model
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['PUT'])
-def edit_package(request, format=None):
+def edit_package(request, package_id):
     try:
-        package = Package.objects.get(amount=request.data['amount'])
+        package = Package.objects.get(pk=package_id)
     except Package.DoesNotExist:
         return JsonResponse({'error': 'Package does not exist.'}, status=404)
 
     serializer = PackageSerializer(package, data=request.data)
     if serializer.is_valid():
+        # Get the new amount and time_period
+        new_amount = serializer.validated_data.get('amount', package.amount)
+        new_time_period = serializer.validated_data.get('time_period', package.time_period)
+
+        # Check if amount and time_period didn't change
+        if package.amount == new_amount and package.time_period == new_time_period:
+            return JsonResponse({'error': 'No changes were made to the package.'}, status=400)
+
         # Check if there is an existing Package object with the same name or amount
         name = serializer.validated_data.get('name', package.name)
         try:
-            existing_package = Package.objects.exclude(amount=package.amount).get(name=name)
+            existing_package = Package.objects.exclude(pk=package.id).get(name=name)
             return JsonResponse({'error': 'A Package with this name already exists.'}, status=400)
         except Package.DoesNotExist:
             pass
 
         amount = serializer.validated_data.get('amount', package.amount)
         try:
-            existing_package = Package.objects.exclude(id=package.id).get(amount=amount)
-            return JsonResponse({'error': 'A Package with this amount already exists.'}, status=400)
+            existing_package = Package.objects.exclude(pk=package.id).get(amount=amount)
+            return JsonResponse({'error': 'A Package with this cost already exists.'}, status=400)
         except Package.DoesNotExist:
             pass
 
@@ -553,6 +574,7 @@ def edit_package(request, format=None):
         serializer.save()
         return JsonResponse(serializer.data)
     return JsonResponse(serializer.errors, status=400)
+
 
 
 @api_view(['POST'])

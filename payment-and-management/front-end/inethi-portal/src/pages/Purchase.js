@@ -4,7 +4,7 @@ import Navigation from "../Components/Navigation/Navigation";
 function Purchase() {
   return (
     <div className="homepage-container">
-        <div className>
+        <div>
             <Navigation/>
         </div>
         <div className="homepage-content">
