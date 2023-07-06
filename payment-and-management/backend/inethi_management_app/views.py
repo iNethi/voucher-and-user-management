@@ -479,7 +479,7 @@ def get_user_payments(request):  # TODO make not keycloack ID only
             latest_payments = Payment.objects.filter(user_id=user)
             serializer = PaymentSerializer(latest_payments, many=True)
             # latest_payments = list(serializer)
-            print(serializer.data)
+            # print(latest_payments)
 
             return JsonResponse(status=200, data=serializer.data, safe=False)
         except Exception as e:
