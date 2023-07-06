@@ -455,18 +455,32 @@ def get_last_payments_by_time_period(request, format=None):
 
 
 @api_view(['GET'])
-def get_user_payments(request, user):  # TODO make not keycloack ID only
+def get_user_payments(request):  # TODO make not keycloack ID only
     if request.method == 'GET':
-        keycloak_id = user
+        # Get the token from the request headers
+        token = request.headers.get('Authorization')
+        if not token:
+            return JsonResponse({'error': 'Token not provided'}, status=400)
+
+        # Remove the 'Bearer ' part
+        token = token[7:]
+
+        try:
+            userinfo = keycloak_openid.userinfo(token)
+            username = userinfo['preferred_username']
+        except Exception as e:
+            print(e)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         try:
             try:
-                user = Users.objects.get(keycloak_id=keycloak_id)
+                user = Users.objects.get(keycloak_id=username)
             except Users.DoesNotExist:
                 return JsonResponse(status=400, data={'error': 'no user found'})
             latest_payments = Payment.objects.filter(user_id=user)
             serializer = PaymentSerializer(latest_payments, many=True)
             # latest_payments = list(serializer)
-            # print(latest_payments)
+            print(serializer.data)
+
             return JsonResponse(status=200, data=serializer.data, safe=False)
         except Exception as e:
             print(e)

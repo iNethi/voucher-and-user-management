@@ -29,7 +29,6 @@ urlpatterns = [
     path('latestpurchase/', views.get_latest_purchase),
     path('latestpurchasetimedif/', views.get_time_since_last_purchase),
     path('latestpurchases/', views.get_last_payments_by_time_period),
-    path('getuserpayments/<str:user>', views.get_user_payments),
     path('getdefaultlimits/', views.get_default_limits),
     path('getuserlimits/<str:user>', views.check_payment_user_limit),
     path('create_package/', views.create_package, name='create_package'),
@@ -40,6 +39,7 @@ urlpatterns = [
     path('create-service-type/', views.create_service_type),
     path('get-user-from-token/', views.get_user_from_token),
     path('get-packages/', views.get_package),
+    path('get_user_payments/', views.get_user_payments),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
