@@ -27,6 +27,7 @@ function App() {
         <Route path="/default-purchase-limits" element={<PurchaseLimits />} />
         <Route path="/services" element={<ServicePage />} />
         <Route path="/packages" element={<Package />} />
+        <Route path="/purchase" element={<Purchase />} />
 
       </Routes>
     </BrowserRouter>

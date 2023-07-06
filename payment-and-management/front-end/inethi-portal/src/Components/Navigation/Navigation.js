@@ -16,6 +16,7 @@ const Navigation = () => {
             <Nav.Link as={Link} to="/default-purchase-limits">Default Purchase Limits</Nav.Link>
             <Nav.Link as={Link} to="/services">Available Services</Nav.Link>
             <Nav.Link as={Link} to="/packages">Packages</Nav.Link>
+            <Nav.Link as={Link} to="/purchase">Purchase</Nav.Link>
           </Nav>
       </Container>
     </Navbar>
