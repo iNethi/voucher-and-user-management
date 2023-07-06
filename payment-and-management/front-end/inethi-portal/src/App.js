@@ -7,6 +7,7 @@ import HomePage from "./pages/HomePage";
 import PurchaseLimits from "./pages/PurchaseLimits";
 import Purchase from "./pages/Purchase";
 import ServicePage from "./pages/ServicePage";
+import Package from "./pages/Package";
 
 function App() {
   const { keycloak, initialized } = useKeycloak();
@@ -25,7 +26,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/default-purchase-limits" element={<PurchaseLimits />} />
         <Route path="/services" element={<ServicePage />} />
-
+        <Route path="/packages" element={<Package />} />
 
       </Routes>
     </BrowserRouter>
