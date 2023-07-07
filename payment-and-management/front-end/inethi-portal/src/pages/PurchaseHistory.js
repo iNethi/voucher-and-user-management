@@ -3,10 +3,12 @@ import Navigation from "../Components/Navigation/Navigation";
 import axios from "axios";
 import {useKeycloak} from "@react-keycloak/web";
 import "bootstrap/dist/css/bootstrap.min.css";
-axios.defaults.baseURL = 'http://0.0.0.0:8000';
+
 function PurchaseHistory() {
     const [payments, setPayments] = useState([]);
     const { keycloak } = useKeycloak();
+      axios.defaults.baseURL = 'http://0.0.0.0:8000';
+      axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
 
     useEffect(() => {
         fetchPayments();
@@ -14,7 +16,7 @@ function PurchaseHistory() {
 
     const fetchPayments = async () => {
         try {
-            const response = await axios.get('/get_user_payments/', {
+            const response = await axios.get('/get-my-payments/', {
                 headers: {
                     'Authorization': `Bearer ${keycloak.token}`
                 }

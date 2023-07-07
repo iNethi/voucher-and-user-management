@@ -37,6 +37,17 @@ def authenticate_keycloak_user(request):
     except:
         return False
 
+def get_user_name(request):
+    token = request.META.get('HTTP_AUTHORIZATION')
+    if not token:
+        return None
+    try:
+        token = token.split(" ")
+        user_info = keycloak_openid.userinfo(token[1])
+        user_name = user_info['preferred_username']
+        return user_name
+    except:
+        return None
 
 def authenticate_admin_user(request):
     token = request.META.get('HTTP_AUTHORIZATION')
@@ -237,6 +248,21 @@ def get_user_payments(request):
         except Exception as e:
             print(e)
             return JsonResponse({'error': 'Bad Request'}, status=400)
+
+
+def get_keycloak_payments_from_token(request):
+    if not authenticate_admin_user(request):
+        return JsonResponse(status=403, data={'error': 'Unauthorized user'})
+    if request.method == 'GET':
+        keycloak_username = get_user_name(request)
+        try:
+            user = Users.objects.get(keycloak_username=keycloak_username)
+            latest_payments = Payment.objects.filter(user_id=user)
+            serializer = PaymentSerializer(latest_payments, many=True)
+            return JsonResponse(serializer.data, status=200, safe=False)
+        except Users.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    return JsonResponse({'error': 'Bad Request'}, status=400)
 
 
 @api_view(['GET'])
