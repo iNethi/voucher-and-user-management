@@ -29,12 +29,14 @@ DATABASES = {
 2. Start a mysql database, traefik instance and keycloak instance. This code is provided for you and explained in this 
 [file](../../infrastructure/README.md).
 3. Start the backend from the backend directory in this repo
-   1. python manage.py makemigrations
-   2. python manage.py migrate
-   3. python manage.py runserver
-   4. python manage.py create_dummy_data
-   5. python manage.py createsuperuser
+   1. `python manage.py migrate`
+   2. `python manage.py makemigrations inethi_management_app`
+   3. `python manage.py migrate`
+   4. `python manage.py createsuperuser`
+   5. `python manage.py create_dummy_data`
+   6. `python manage.py runserver`
 4. Start the frontend
+`npm start`
 
 ## Endpoints and Common tasks
 List of tasks that this backend can carry out and the endpoint corresponding to that task.

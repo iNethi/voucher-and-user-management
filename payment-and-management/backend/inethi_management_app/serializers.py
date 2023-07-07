@@ -1,82 +1,61 @@
-from rest_framework import serializers, generics
+from rest_framework import serializers
 from .models import *
 
 
 class ServiceTypesSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceTypes
-        fields = [
-            'description',
-            'pay_type',
-            'service_type_id'
-        ]
+        fields = '__all__'
 
 
 class UsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
-        fields = [
-            'keycloak_id',
-            'email_encrypt',
-            'phonenum_encrypt',
-            'joindate_time'
-        ]
+        fields = '__all__'
 
 
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
-        fields = [
-            'user_id',
-            'payment_method',
-            'amount',
-            'paydate_time',
-            'service_type_id',
-            'service_period_sec',
-            'package',
-            'voucher'
-
-        ]
-
-
-class UserPaymentLimitsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserPaymentLimits
-        fields = [
-            'user_id',
-            'service_type_id',
-            'payment_method',
-            'payment_limit',
-            'payment_limit_period_sec',
-        ]
+        fields = '__all__'
 
 
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = [
-            'user_id',
-            'service_type_id',
-            'user_encrypt',
-            'pass_encrypt',
-            'join_datetime',
-            'misc1',
-            'misc2'
-        ]
+        fields = '__all__'
 
 
 class DefaultPaymentLimitsSerializer(serializers.ModelSerializer):
     class Meta:
         model = DefaultPaymentLimits
-        fields = [
-            'service_type_id',
-            'payment_method',
-            'payment_limit',
-            'payment_limit_period_sec',
-        ]
+        fields = '__all__'
+
+
+class PaymentMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentMethods
+        fields = '__all__'
 
 
 class PackageSerializer(serializers.ModelSerializer):
+    payment_method = PaymentMethodSerializer(read_only=True)
+
     class Meta:
         model = Package
+        fields = ['name', 'service_id', 'description', 'amount', 'payment_method', 'time_period', 'created_date', 'updated_date']
+        read_only_fields = ['payment_method']
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.service_id = validated_data.get('service_id', instance.service_id)
+        instance.description = validated_data.get('description', instance.description)
+        instance.amount = validated_data.get('amount', instance.amount)
+        instance.time_period = validated_data.get('time_period', instance.time_period)
+        instance.save()
+        return instance
+
+class UserPaymentLimitsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserPaymentLimits
         fields = '__all__'

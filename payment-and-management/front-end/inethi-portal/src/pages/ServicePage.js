@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navigation from '../Components/Navigation/Navigation';
 import { Button, Modal, Form } from 'react-bootstrap';
-import {useKeycloak} from "@react-keycloak/web";
+import { useKeycloak } from "@react-keycloak/web";
 
-axios.defaults.baseURL = 'http://0.0.0.0:8000';
 
 function ServicePage() {
   const { keycloak } = useKeycloak();
+  axios.defaults.baseURL = 'http://0.0.0.0:8000';
+  axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
   const [services, setServices] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -19,7 +20,7 @@ function ServicePage() {
 
   useEffect(() => {
     // Fetch services
-    axios.get('/services/')
+    axios.get('/get-services/')
       .then(response => {
         console.log(response.data);
         setServices(response.data);
@@ -34,27 +35,28 @@ function ServicePage() {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    const dataWithToken = {
-    ...formData,
-    token: keycloak.token,  // append token to formData
+  e.preventDefault();
+  const fromData= {
+    name: formData.name,
+    description: formData.description,
   };
 
-    axios.post('/create-service-type/', dataWithToken)
-      .then(response => {
-        setModalMessage("Successfully created a new service type.");
-        setShowModal(true);
-        // Refresh services list
-        axios.get('/services/')
-          .then(response => {
-            setServices(response.data);
-          });
+  axios.post('/create-service-type/', fromData)
+    .then(response => {
+      setModalMessage("Successfully created a new service type.");
+      setShowModal(true);
+      // Refresh services list
+      axios.get('/get-services/')
+        .then(response => {
+          setServices(response.data);
+        });
       })
       .catch(error => {
-        setModalMessage("Failed to create a new service type. " + error.response.data.error);
+        setModalMessage(error.response.data.error);
         setShowModal(true);
       });
   };
+
 
   const handleCloseModal = () => {
     setShowModal(false);
@@ -68,43 +70,48 @@ function ServicePage() {
       <div className="homepage-content">
         <h1>Services</h1>
         <h2>Available Services</h2>
-         <ul>
-          {services.map((service, index) => (
-            <li key={index}>Name: {service.description}, ID: {service.service_type_id}</li>
-          ))}
-        </ul>
+        <table className="table">
+          <thead className="thead-light">
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {services.map(service => (
+              <tr key={service.name}>
+                <td>{service.name}</td>
+                <td>{service.description}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
         {keycloak.tokenParsed && keycloak.tokenParsed.preferred_username === 'inethi' && (
-            <>
-          <h2>Create a New Service</h2>
-          <Form onSubmit={handleSubmit}>
-          <Form.Group controlId="serviceTypeId">
-          <Form.Label>Service Type ID</Form.Label>
-          <Form.Control type="text" name="service_type_id" onChange={handleChange} required />
-          </Form.Group>
-          <Form.Group controlId="description">
-          <Form.Label>Description</Form.Label>
-          <Form.Control type="text" name="description" onChange={handleChange} required />
-          </Form.Group>
-          <Form.Group controlId="payType">
-          <Form.Label>Pay Type</Form.Label>
-          <Form.Control as="select" name="pay_type" onChange={handleChange} required>
-          <option value="FR">Free</option>
-          <option value="PA">Paid</option>
-          </Form.Control>
-          </Form.Group>
-          <Button variant="primary" type="submit">Create</Button>
-          </Form>
-          <Modal show={showModal} onHide={handleCloseModal}>
-          <Modal.Header closeButton>
-          <Modal.Title>Service Type Creation Status</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>{modalMessage}</Modal.Body>
-          <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>Close</Button>
-          </Modal.Footer>
-          </Modal>
+          <>
+            <h2>Create a New Service</h2>
+            <Form onSubmit={handleSubmit}>
+              <Form.Group controlId="serviceName">
+              <Form.Label>Name</Form.Label>
+              <Form.Control type="text" name="name" onChange={handleChange} required />
+              </Form.Group>
+              <Form.Group controlId="serviceDescription">
+              <Form.Label>Description</Form.Label>
+              <Form.Control type="text" name="description" onChange={handleChange} required />
+              </Form.Group>
+
+              <Button variant="primary" type="submit">Create</Button>
+            </Form>
+            <Modal show={showModal} onHide={handleCloseModal}>
+              <Modal.Header closeButton>
+                <Modal.Title>Service Type Creation Status</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>{modalMessage}</Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleCloseModal}>Close</Button>
+              </Modal.Footer>
+            </Modal>
           </>
-          )}
+        )}
       </div>
     </div>
   );
