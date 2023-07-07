@@ -7,16 +7,7 @@ import axios from "axios";
 axios.defaults.baseURL = 'http://0.0.0.0:8000';
 function HomePage() {
   const { keycloak } = useKeycloak();
-    useEffect(() => {
-    // Fetch services
-    axios.post('/get-user-from-token/', {token: keycloak.token})
-      .then(response => {
-        console.log(response.data);
-      })
-      .catch(error => {
-        console.error(`Error fetching services: ${error}`);
-      });
-  }, []);
+
   return (
     <div className="homepage-container">
       <div>
