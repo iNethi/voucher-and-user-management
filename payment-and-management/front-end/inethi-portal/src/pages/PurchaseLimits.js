@@ -3,16 +3,18 @@ import Navigation from "../Components/Navigation/Navigation";
 import axios from "axios";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {useKeycloak} from "@react-keycloak/web";
-axios.defaults.baseURL = 'http://0.0.0.0:8000';
+
 
 function PurchaseLimits() {
   const { keycloak } = useKeycloak();
+  axios.defaults.baseURL = 'http://0.0.0.0:8000';
+  axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
   const [showModal, setShowModal] = useState(false);
   const [responseMessage, setResponseMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
   const [services, setServices] = useState([]);
   const [limits, setLimits] = useState([]);
-  const [paymentMethods, setPaymentMethods] = useState({});
+  const [paymentMethods, setPaymentMethods] = useState([]);
   const [editLimit, setEditLimit] = useState(null);
   const [editData, setEditData] = useState({
     service_type_id: '',
@@ -29,7 +31,7 @@ function PurchaseLimits() {
 
   useEffect(() => {
     // Fetch services
-    axios.get('/services/')
+    axios.get('/get-services/')
       .then(response => {
         setServices(response.data);
       })
@@ -48,12 +50,13 @@ function PurchaseLimits() {
 
     // Fetch payment methods
     axios.get('/payment-methods/')
-      .then(response => {
-        setPaymentMethods(response.data);
-      })
-      .catch(error => {
-        console.error(`Error fetching payment methods: ${error}`);
-      });
+  .then(response => {
+    const paymentMethodsArray = Object.values(response.data);
+    setPaymentMethods(paymentMethodsArray);
+  })
+  .catch(error => {
+    console.error(`Error fetching payment methods: ${error}`);
+  });
 
   }, []);
 
@@ -86,7 +89,7 @@ function PurchaseLimits() {
     ...editData,
     token: keycloak.token,  // append token to formData
   };
-    axios.put('/update_default_payment_limit/', editDataWithToken)
+    axios.put('/update-default-payment-limit/', editDataWithToken)
       .then(response => {
         const updatedLimit = response.data;
         setLimits(limits.map(limit => limit === editLimit ? updatedLimit : limit));
@@ -115,7 +118,7 @@ const createNewLimit = e => {
     ...newLimitData,
     token: keycloak.token,  // append token to formData
   };
-  axios.post('/create_default_payment_limit/', newLimitDataWithToken)
+  axios.post('/create-default-payment-limit/', newLimitDataWithToken)
     .then(response => {
       if (response.status >= 200 && response.status < 300) {
         setLimits([...limits, response.data]);
@@ -153,25 +156,41 @@ const createNewLimit = e => {
         <h1>Default Purchase Limits</h1>
         <div>
           <h2>Default Limits</h2>
-        <ul>
-          {limits.map((limit, index) => {
-            const relatedService = services.find(service => service.service_type_id === limit.service_type_id);
-
-            return (
-              <li key={index}>
-                Service Type ID: {limit.service_type_id},
-                Service Description: {relatedService ? relatedService.description : 'Not found'},
-                Payment Method ID: {limit.payment_method},
-                Payment Method: {paymentMethods[limit.payment_method]},
-                Payment Limit: {limit.payment_limit},
-                Payment Limit Period (sec): {limit.payment_limit_period_sec}
-                {(keycloak.tokenParsed && keycloak.tokenParsed.preferred_username === 'inethi') && (
-        <button onClick={() => edit(limit)}>Edit</button>
+        <table className="table">
+  <thead className="thead-light">
+    <tr>
+      <th>Service Name</th>
+      <th>Service Description</th>
+      <th>Payment Method</th>
+      <th>Payment Limit</th>
+      <th>Payment Limit Period (sec)</th>
+      {(keycloak.tokenParsed && keycloak.tokenParsed.preferred_username === 'inethi') && (
+        <th>Action</th>
       )}
-              </li>
-            );
-          })}
-        </ul>
+    </tr>
+  </thead>
+  <tbody>
+    {limits.map((limit, index) => {
+      const relatedService = services.find(service => service.service_type_id === limit.service_type_id);
+      const relatedPaymentMethod = paymentMethods.find(method => method.id === limit.payment_method);
+
+      return (
+        <tr key={index}>
+          <td>{relatedService.name}</td>
+          <td>{relatedService ? relatedService.description : 'Not found'}</td>
+          <td>{relatedPaymentMethod ? relatedPaymentMethod.name : 'Not found'}</td>
+          <td>{limit.payment_limit}</td>
+          <td>{limit.payment_limit_period_sec}</td>
+          {(keycloak.tokenParsed && keycloak.tokenParsed.preferred_username === 'inethi') && (
+            <td>
+              <button onClick={() => edit(limit)}>Edit</button>
+            </td>
+          )}
+        </tr>
+      );
+    })}
+  </tbody>
+</table>
           {editLimit && (
   <div className="card">
     <h2>Edit Limit</h2>
@@ -214,13 +233,14 @@ const createNewLimit = e => {
             <label>
               Payment Method:
               <select name="payment_method" value={newLimitData.payment_method} onChange={handleNewLimitInputChange}>
-                <option value="">Select a payment method</option>
-                {Object.entries(paymentMethods).map(([key, value], index) => (
-                  <option value={key} key={index}>
-                    {value}
-                  </option>
-                ))}
-              </select>
+  <option value="">Select a payment method</option>
+  {paymentMethods.map((method) => (
+                    <option key={method.id} value={method.id}>
+                      {method.name}
+                    </option>
+  ))}
+</select>
+
             </label>
             <label>
               Payment Limit:
