@@ -2,10 +2,13 @@ import React, { useEffect, useState } from "react";
 import Navigation from "../Components/Navigation/Navigation";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
+import {useKeycloak} from "@react-keycloak/web";
 
 function Purchase() {
   const [packages, setPackages] = useState([]);
-
+  const { keycloak } = useKeycloak();
+  axios.defaults.baseURL = 'http://0.0.0.0:8000';
+  axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
   useEffect(() => {
     // Fetch packages
     axios
@@ -38,17 +41,22 @@ function Purchase() {
             <thead className="thead-light">
               <tr>
                 <th>Name</th>
+                  <th>Description</th>
                 <th>Amount</th>
+                <th>Payment Method</th>
                 <th>Time Period</th>
-                <th>Action</th>
+
               </tr>
             </thead>
             <tbody>
               {packages.map(pkg => (
                 <tr key={pkg.id}>
                   <td>{pkg.name}</td>
+                    <td>{pkg.description}</td>
                   <td>{pkg.amount}</td>
+                  <td>{pkg.payment_method.name}</td>
                   <td>{pkg.time_period}</td>
+
                   <td>
                     <button onClick={() => handlePurchase(pkg)} className="btn btn-primary">Purchase</button>
                   </td>
