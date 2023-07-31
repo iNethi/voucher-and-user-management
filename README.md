@@ -47,6 +47,7 @@ DATABASES = {
 ```
 npm start
 ```
+4. Navigate to [the front end](http://localhost:3000/) in your browser. Login with a keycloak user and test the app.
 
 ## Keycloak
 ### Clients
