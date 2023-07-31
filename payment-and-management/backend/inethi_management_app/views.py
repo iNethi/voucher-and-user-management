@@ -394,19 +394,26 @@ def create_default_payment_limit(request, format=None):
         payment_method = data.get('payment_method')
         payment_limit = data.get('payment_limit')
         payment_limit_period_sec = data.get('payment_limit_period_sec')
-
+        print(service_type_id)
         # Check if service_type_id is valid
         try:
-            service_type = ServiceTypes.objects.get(service_type_id=service_type_id)
+            service_type = ServiceTypes.objects.get(id=service_type_id)
+            print(service_type.id)
+        except ServiceTypes.DoesNotExist:
+            return JsonResponse(status=400, data={'error': 'Invalid service type id'})
+
+        try:
+            payment_method = PaymentMethods.objects.get(name=payment_method)
+            print(service_type.id)
         except ServiceTypes.DoesNotExist:
             return JsonResponse(status=400, data={'error': 'Invalid service type id'})
 
         # Check if default payment limit already exists for given service type and payment method
-        if DefaultPaymentLimits.objects.filter(service_type=service_type, payment_method=payment_method).exists():
+        if DefaultPaymentLimits.objects.filter(service_id=service_type.id, payment_method=payment_method.id).exists():
             return JsonResponse(status=400, data={
                 'error': 'Default payment limit already exists for this service type and payment method'})
 
-        default_payment_limit = DefaultPaymentLimits(service_type=service_type, payment_method=payment_method,
+        default_payment_limit = DefaultPaymentLimits(service_id=service_type, payment_method=payment_method,
                                                      payment_limit=payment_limit,
                                                      payment_limit_period_sec=payment_limit_period_sec)
         default_payment_limit.save()
@@ -426,13 +433,13 @@ def update_default_payment_limit(request, format=None):
         payment_limit_period_sec = data.get('payment_limit_period_sec')
         # Check if service_type_id is valid
         try:
-            service_type = ServiceTypes.objects.get(service_type_id=service_type_id)
+            service_type = ServiceTypes.objects.get(id=service_type_id)
         except ServiceTypes.DoesNotExist:
             return JsonResponse(status=400, data={'error': 'Invalid service type id'})
 
         # Check if default payment limit exists for given service type and payment method
         try:
-            limit = DefaultPaymentLimits.objects.get(service_type=service_type, payment_method=payment_method)
+            limit = DefaultPaymentLimits.objects.get(service_id=service_type, payment_method=payment_method)
         except DefaultPaymentLimits.DoesNotExist:
             return JsonResponse(status=404, data={
                 'error': 'Default payment limit does not exist for this service type and payment method'})

@@ -30,40 +30,33 @@ function PurchaseLimits() {
   });
 
   useEffect(() => {
-    // Fetch services
-    axios.get('/get-services/')
-      .then(response => {
-        setServices(response.data);
-      })
-      .catch(error => {
-        console.error(`Error fetching services: ${error}`);
-      });
-
-    // Fetch default payment limits
-    axios.get('/getdefaultlimits/')
-      .then(response => {
-        setLimits(response.data);
-      })
-      .catch(error => {
-        console.error(`Error fetching default payment limits: ${error}`);
-      });
-
-    // Fetch payment methods
+  Promise.all([
+    axios.get('/get-services/'),
+    axios.get('/getdefaultlimits/'),
     axios.get('/payment-methods/')
-  .then(response => {
-    const paymentMethodsArray = Object.values(response.data);
+  ])
+  .then(([servicesResponse, limitsResponse, paymentMethodsResponse]) => {
+    console.log('servicesResponse')
+    console.log(servicesResponse.data)
+    setServices(servicesResponse.data);
+    console.log('limitsResponse')
+    console.log(limitsResponse.data)
+    setLimits(limitsResponse.data);
+    console.log('paymentMethodsResponse')
+    console.log(paymentMethodsResponse.data)
+    const paymentMethodsArray = Object.values(paymentMethodsResponse.data);
     setPaymentMethods(paymentMethodsArray);
   })
   .catch(error => {
-    console.error(`Error fetching payment methods: ${error}`);
+    console.error(`Error fetching data: ${error}`);
   });
+}, []);
 
-  }, []);
 
   const edit = limit => {
     setEditLimit(limit);
     setEditData({
-      service_type_id: limit.service_type_id,
+      service_type_id: limit.service_id,
       payment_method: limit.payment_method,
       payment_limit: limit.payment_limit,
       payment_limit_period_sec: limit.payment_limit_period_sec,
@@ -171,7 +164,7 @@ const createNewLimit = e => {
   </thead>
   <tbody>
     {limits.map((limit, index) => {
-      const relatedService = services.find(service => service.service_type_id === limit.service_type_id);
+      const relatedService = services.find(service => service.id === limit.service_id);
       const relatedPaymentMethod = paymentMethods.find(method => method.id === limit.payment_method);
 
       return (
@@ -220,12 +213,12 @@ const createNewLimit = e => {
           <h2>Create New Limit</h2>
           <form onSubmit={createNewLimit}>
             <label>
-              Service Type ID:
+              Service:
               <select name="service_type_id" value={newLimitData.service_type_id} onChange={handleNewLimitInputChange}>
                 <option value="">Select a service type</option>
                 {services.map((service, index) => (
-                  <option value={service.service_type_id} key={index}>
-                    {service.service_type_id} - {service.description}
+                  <option value={service.id} key={index}>
+                    {service.name} - {service.description}
                   </option>
                 ))}
               </select>
@@ -235,7 +228,7 @@ const createNewLimit = e => {
               <select name="payment_method" value={newLimitData.payment_method} onChange={handleNewLimitInputChange}>
   <option value="">Select a payment method</option>
   {paymentMethods.map((method) => (
-                    <option key={method.id} value={method.id}>
+                    <option key={method.payment_method} value={method.payment_method}>
                       {method.name}
                     </option>
   ))}

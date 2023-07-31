@@ -7,9 +7,6 @@ class ServiceTypes(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = models.CharField(max_length=100)
 
-    def __str__(self):
-        return str(self.description)
-
 
 class PaymentMethods(models.Model):
     name = models.CharField(max_length=50, unique=True)
