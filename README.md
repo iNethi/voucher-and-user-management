@@ -5,7 +5,11 @@ A user management portal for iNethi that uses React and Django.
 1. Ensure you have traefik running with a keycloak instance running.
    1. Ensure a keycloak client is set up for both django and react purposes. The configs can be found in [here](./config) and can 
    be imported when creating a new client.
-2. Start the backend
+2. Start a mysql database for the django backend by running the build script [here](./infrastructure/mysql):
+```
+./build.sh
+```
+3. Set up and run the backend
    1. To do this you will need to edit your ```settings.py``` file [here](./payment-and-management/backend/inethi_management/settings.py)
    to look like this:
 ```
@@ -31,18 +35,15 @@ DATABASES = {
 
 }
 ```
-2. Start a mysql database for the django backend by running the build script [here](./infrastructure/mysql/):
-```
-./build.sh
-```
-3. Start the backend from the backend directory in this repo [here](./payment-and-management/backend) by running:
-   1. `python manage.py migrate`
-   2. `python manage.py makemigrations inethi_management_app`
+   2. Start the backend from the backend directory in this repo [here](./payment-and-management/backend) by running:
    3. `python manage.py migrate`
-   4. `python manage.py createsuperuser`
-   5. `python manage.py create_dummy_data`
-   6. `python manage.py runserver`
-4. Start the frontend from [here](./payment-and-management/front-end/inethi-portal):
+   4. `python manage.py makemigrations inethi_management_app`
+   5. `python manage.py migrate`
+   6. `python manage.py createsuperuser`
+   7. `python manage.py create_dummy_data`
+   8. `python manage.py runserver`
+
+3. Start the frontend from [here](./payment-and-management/front-end/inethi-portal):
 ```
 npm start
 ```
