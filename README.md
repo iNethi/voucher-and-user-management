@@ -1,20 +1,48 @@
-# iNethi ft. User management and Voucher
+# iNethi Management and Payment System
 A user management portal for iNethi that uses React and Django.
 
-## Running this code
-This code should be set up and run via the iNehti GUI Installer unless you are wanting to work on the code in
-a dev or custom capacity. For this type of work, follow the instructions in the README 
-[here](./payment-and-management/backend/README.md)
+## Running this code (no radius desk)
+1. Ensure you have traefik running with a keycloak instance running.
+   1. Ensure a keycloak client is set up for both django and react purposes. The configs can be found in [here](./config) and can 
+   be imported when creating a new client.
+2. Start the backend
+   1. To do this you will need to edit your ```settings.py``` file [here](./payment-and-management/backend/inethi_management/settings.py)
+   to look like this:
+```
+DATABASES = {
+    'default': {
+        # MySQL engine. Powered by the mysqlclient module.
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'inethi-user-management-api',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '0.0.0.0',
+        # 'HOST': 'inethi-user-management-mysql',
+        'PORT': '3316',
+    },
+    # 'radiusdeskdb': {
+    #     'NAME': 'rd',
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'USER': 'rd',
+    #     'PASSWORD': 'rd',
+    #     'HOST': 'inethi-radiusdesk-mariadb',
+    #     'PORT': '3306',
+    # }
 
-## Setting up
-To set up **_Keycloak_** to allow users to log in to the front end follow these steps:
-1. Log in to the Keycloak admin console and select the realm that you want to use. 
-2. Click on the "Clients" link in the left-hand navigation menu. 
-3. Click on the "Create" button to create a new client. 
-4. In the "Client ID" field, enter the ID that you want to use for your client. 
-5. In the "Client Protocol" field, select the protocol that you want to use for your client. If you are using a React app, you can select "openid-connect" as the protocol. 
-6. In the "Root URL" field, enter the root URL of your React app. This is the URL that users will use to access your app. 
-7. In the "Valid Redirect URIs" field, enter the URLs that are allowed to redirect to your app after authentication. If you are running your React app on localhost, you can enter http://localhost:3000/* as the valid redirect URI. 
-8. In the "Web Origins" field, enter the URLs that are allowed to access your app. If you are running your React app on localhost, you can enter http://localhost:3000 as the web origin. 
-9. In the "Access Type" field, select the type of access that you want to use for your client. If you are using a React app, you can select "public" as the access type. 
-10. Click on the "Save" button to save your client.
+}
+```
+2. Start a mysql database for the django backend by running the build script [here](./infrastructure/mysql/):
+```
+./build.sh
+```
+3. Start the backend from the backend directory in this repo [here](./payment-and-management/backend) by running:
+   1. `python manage.py migrate`
+   2. `python manage.py makemigrations inethi_management_app`
+   3. `python manage.py migrate`
+   4. `python manage.py createsuperuser`
+   5. `python manage.py create_dummy_data`
+   6. `python manage.py runserver`
+4. Start the frontend from [here](./payment-and-management/front-end/inethi-portal):
+```
+npm start
+```
