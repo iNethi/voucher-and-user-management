@@ -46,3 +46,8 @@ DATABASES = {
 ```
 npm start
 ```
+
+## Keycloak
+### Clients
+1. **portal-local client**: a public client used to authenticate users when they want to make an API call and login to 
+the React app. It allows the backend token-based authentication.
