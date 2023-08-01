@@ -86,7 +86,10 @@ const searchUserLimits = (e) => {
   axios.get(searchUrl, {
     headers: { 'Authorization': `Bearer ${keycloak.token}` }
   })
-    .then(response => setUserLimits(response.data))
+    .then(response => {
+      setUserLimits(response.data)
+      console.log(response.data)
+    })
     .catch(error => {
       setErrorMessage(`Error fetching user limits: ${error}`);
       setShowModal(true);
@@ -157,22 +160,37 @@ const searchUserLimits = (e) => {
           <div>
             <h2>User Limits</h2>
             {/* Table to display user-specific limits */}
-        <table>
+        <table className="table">
+          <thead className="thead-light">
+    <tr>
+      <th>Service Name</th>
+      <th>Payment Method</th>
+      <th>Payment Limit</th>
+      <th>Payment Limit Period (sec)</th>
+      {(keycloak.tokenParsed && keycloak.tokenParsed.preferred_username === 'inethi') && (
+        <th>Action</th>
+      )}
+    </tr>
+  </thead>
           <tbody>
-            {userLimits.map((limit, index) => (
-              <tr key={index}>
-                {/* Replace these with the correct fields */}
-                <td>{limit.service_type_id}</td>
-                <td>{limit.payment_method}</td>
-                <td>{limit.payment_limit}</td>
-                <td>{limit.payment_limit_period_sec}</td>
-                {(keycloak.tokenParsed && keycloak.tokenParsed.preferred_username === 'inethi') && (
-                  <td>
-                    <button onClick={() => edit(limit)}>Edit</button>
-                  </td>
-                )}
-              </tr>
-            ))}
+            {userLimits.map((limit, index) => {
+              const relatedService = services.find(service => service.id === limit.service_type_id);
+              const relatedPaymentMethod = paymentMethods.find(method => method.id === limit.payment_method);
+              return (
+                  <tr key={index}>
+                    {/* Replace these with the correct fields */}
+                    <td>{relatedService ? relatedService.description : 'Not found'}</td>
+                    <td>{relatedPaymentMethod ? relatedPaymentMethod.name : 'Not found'}</td>
+                    <td>{limit.payment_limit}</td>
+                    <td>{limit.payment_limit_period_sec}</td>
+                    {(keycloak.tokenParsed && keycloak.tokenParsed.preferred_username === 'inethi') && (
+                        <td>
+                          <button onClick={() => edit(limit)}>Edit</button>
+                        </td>
+                    )}
+                  </tr>
+              )
+            })}
           </tbody>
         </table>
           </div>

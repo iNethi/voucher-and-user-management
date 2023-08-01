@@ -85,9 +85,7 @@ def create_user_specific_limit(request):
         cellphone_number = request.data.get('cellphone_number')
         email = request.data.get('email')
         service_type_id = request.data.get('service_type_id')
-        print(service_type_id)
         payment_method_id = request.data.get('payment_method')
-        print(payment_method_id)
         payment_limit = request.data.get('payment_limit')
         payment_limit_period_sec = request.data.get('payment_limit_period_sec')
 
@@ -104,6 +102,17 @@ def create_user_specific_limit(request):
             service_type = ServiceTypes.objects.get(pk=service_type_id)
             payment_method = PaymentMethods.objects.get(name=payment_method_id)
 
+            # Check if the limit already exists for the user, service type, and payment method
+            existing_limit = UserPaymentLimits.objects.filter(
+                user_id=user,
+                service_type_id=service_type,
+                payment_method=payment_method
+            )
+
+            if existing_limit.exists():
+                return Response({"error": "Limit already exists for this user, service type, and payment method"},
+                                status=status.HTTP_400_BAD_REQUEST)
+
             # Create a new UserPaymentLimits instance
             user_payment_limit = UserPaymentLimits(
                 user_id=user,
@@ -117,7 +126,8 @@ def create_user_specific_limit(request):
             return Response({"message": "User specific limit created successfully!"}, status=status.HTTP_201_CREATED)
 
         except (Users.DoesNotExist, ServiceTypes.DoesNotExist, PaymentMethods.DoesNotExist):
-            return Response({"error": "Invalid user, service type, or payment method"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Invalid user, service type, or payment method"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 
