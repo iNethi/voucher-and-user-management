@@ -4,7 +4,7 @@ A user management portal for iNethi that uses React and Django.
 ## Running this code (no radius desk)
 1. Ensure you have traefik running with a keycloak instance running.
    1. Ensure a keycloak client is set up for both django and react purposes. The configs can be found in [here](./config) and can 
-   be imported when creating a new client.
+   be imported when creating a new client. Recreate your JWT credentials after importing the client to ensure your credentials are unique to you.
 2. Start a mysql database for the django backend by running the build script [here](./infrastructure/mysql):
 ```
 ./build.sh
