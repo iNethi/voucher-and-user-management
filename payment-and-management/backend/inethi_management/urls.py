@@ -19,6 +19,7 @@ urlpatterns = [
     path('get-user-payments/', views.get_user_payments),
     path('get-my-payments/', views.get_keycloak_payments_from_token),
     path('get-services/', views.request_services),
+    path('update-user-payment-limit/', views.update_user_payment_limit),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

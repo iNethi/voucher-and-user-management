@@ -15,11 +15,13 @@ from rest_framework import status
 import pytz
 from keycloak import KeycloakOpenID
 from urllib.parse import unquote
+
 keycloak_openid = KeycloakOpenID(
     server_url="https://keycloak.inethilocal.net/auth/",
     client_id="portal-local",
     realm_name="master",
 )
+
 
 def authenticate_keycloak_user(request):
     token = request.META.get('HTTP_AUTHORIZATION')
@@ -37,6 +39,7 @@ def authenticate_keycloak_user(request):
     except:
         return False
 
+
 def get_user_name(request):
     token = request.META.get('HTTP_AUTHORIZATION')
     if not token:
@@ -48,6 +51,7 @@ def get_user_name(request):
         return user_name
     except:
         return None
+
 
 def authenticate_admin_user(request):
     token = request.META.get('HTTP_AUTHORIZATION')
@@ -71,7 +75,6 @@ def get_payment_methods(request):
     payment_methods = PaymentMethods.objects.all()
     payment_methods_data = [{'id': method.id, 'name': method.name} for method in payment_methods]
     return JsonResponse(payment_methods_data, safe=False)
-
 
 
 @api_view(['GET'])
@@ -110,6 +113,47 @@ def check_payment_user_limit(request, format=None):
         return JsonResponse(status=404, data={'error': 'user not registered'})
     except UserPaymentLimits.DoesNotExist:
         return JsonResponse(status=404, data={'error': 'user payment limit not set'})
+
+
+@api_view(['PUT'])
+def update_user_payment_limit(request, format=None):
+    if not authenticate_admin_user(request):
+        return JsonResponse(status=403, data={'error': 'Unauthorized user'})
+
+    data = json.loads(request.body)
+    phone_num = data.get('phone_num', None)
+    email = data.get('email', None)
+    keycloak_username = data.get('keycloak_username', None)
+    service_type_id = data.get('service_type_id')
+    payment_method_id = data.get('payment_method_id')
+    payment_limit = data.get('payment_limit')
+    payment_limit_period_sec = data.get('payment_limit_period_sec')
+
+    if not (phone_num or email or keycloak_username) or not service_type_id or not payment_method_id or payment_limit is None or payment_limit_period_sec is None:
+        return JsonResponse(status=400, data={'error': 'Missing required parameters in the request'})
+
+    try:
+        if phone_num:
+            user = Users.objects.get(phonenum=phone_num)
+        elif email:
+            user = Users.objects.get(email=email)
+        else:
+            user = Users.objects.get(keycloak_username=keycloak_username)
+    except Users.DoesNotExist:
+        return JsonResponse(status=404, data={'error': 'User not found'})
+
+    service_type = get_object_or_404(ServiceTypes, pk=service_type_id)
+    payment_method = get_object_or_404(PaymentMethods, pk=payment_method_id)
+
+    limit, created = UserPaymentLimits.objects.get_or_create(user_id=user, service_type_id=service_type,
+                                                             payment_method=payment_method)
+    limit.payment_limit = payment_limit
+    limit.payment_limit_period_sec = payment_limit_period_sec
+    limit.save()
+
+    serializer = UserPaymentLimitsSerializer(limit)
+    return Response(serializer.data, status=status.HTTP_200_OK if not created else status.HTTP_201_CREATED)
+
 
 
 @api_view(['GET'])
@@ -357,7 +401,6 @@ def edit_package(request, package_name):
 
         # Check if amount and time_period didn't change
         if package.amount == new_amount and package.time_period == new_time_period:
-
             return JsonResponse({'error': 'No changes were made to the package.'}, status=400)
 
         # Check if there is an existing Package object with the same name or amount
