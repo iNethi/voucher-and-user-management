@@ -9,6 +9,7 @@ function UserSpecificLimits() {
   const [userLimits, setUserLimits] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
     const [searchType, setSearchType] = useState('keycloak_username'); // default search type
+
   axios.defaults.baseURL = 'http://0.0.0.0:8000';
   axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
   const [userLimitData, setUserLimitData] = useState({
@@ -46,26 +47,39 @@ const [paymentMethod, setPaymentMethod] = useState('');
       });
   }, []);
   // This will be called when the Edit button is clicked
-  const edit = (limit) => {
-    setEditData(limit);
-    setEditLimit(true);
-  };
+const edit = (limit) => {
+  const relatedService = services.find(service => service.id === limit.service_type_id);
+  const relatedPaymentMethod = paymentMethods.find(method => method.id === limit.payment_method);
+
+  setEditData({
+    ...limit,
+    service_name: relatedService ? relatedService.name : 'Not found',
+    payment_method_name: relatedPaymentMethod ? relatedPaymentMethod.name : 'Not found',
+  });
+  setEditLimit(true);
+};
 
   // This will handle the save action for the edited limit
   const save = () => {
-    // Replace this URL with the correct endpoint for editing a user-specific limit
-    axios.post('http://0.0.0.0:8000/edit-user-specific-limit/', editData, {
+    const payload = {
+    ...editData,
+      searchType: searchType,
+    searchValue: searchTerm, // Include the search term in the payload
+  };
+    axios.put('http://0.0.0.0:8000/update-user-payment-limit/', payload, {
       headers: { 'Authorization': `Bearer ${keycloak.token}` }
     })
       .then(response => {
         setResponseMessage('Limit edited successfully!');
         setShowModal(true);
-        // Update the limits data here as needed
+        setEditLimit(false); // Close the edit form
+        searchUserData()
       })
       .catch(error => {
         setErrorMessage(`Error editing limit: ${error.response.data.error}`);
         setShowModal(true);
       });
+
   };
 
   const closeModal = () => {
@@ -81,6 +95,10 @@ const searchUserLimits = (e) => {
     return;
   }
 
+  searchUserData()
+};
+
+const searchUserData = () => {
   const searchUrl = `http://0.0.0.0:8000/search-user-limits/?${searchType}=${searchTerm}`;
 
   axios.get(searchUrl, {
@@ -91,10 +109,9 @@ const searchUserLimits = (e) => {
       console.log(response.data)
     })
     .catch(error => {
-      setErrorMessage(`Error fetching user limits: ${error}`);
-      setShowModal(true);
+      console.log(`Error fetching user limits: ${error}`);
     });
-};
+  }
 
 
 
@@ -122,6 +139,7 @@ const searchUserLimits = (e) => {
         });
       setResponseMessage('User specific limit created successfully!');
       setShowModal(true);
+      setUserLimits([])
     })
       .catch(error => {
       setErrorMessage(`Error creating user limit: ${error.response.data.error}`);
@@ -179,7 +197,7 @@ const searchUserLimits = (e) => {
               return (
                   <tr key={index}>
                     {/* Replace these with the correct fields */}
-                    <td>{relatedService ? relatedService.description : 'Not found'}</td>
+                    <td>{relatedService ? relatedService.name : 'Not found'}</td>
                     <td>{relatedPaymentMethod ? relatedPaymentMethod.name : 'Not found'}</td>
                     <td>{limit.payment_limit}</td>
                     <td>{limit.payment_limit_period_sec}</td>
@@ -198,6 +216,30 @@ const searchUserLimits = (e) => {
         )}
         </div>
         <div>
+          {editLimit && (
+  <div className="card">
+    <h2>Edit Limit</h2>
+    <form onSubmit={e => { e.preventDefault(); save(); }}>
+      <label>
+        Service Name:
+        <input name="service_name" type="text" value={editData && editData.service_name} readOnly />
+      </label>
+      <label>
+        Payment Method:
+        <input name="payment_method_name" type="text" value={editData && editData.payment_method_name} readOnly />
+      </label>
+      <label>
+        Payment Limit:
+        <input name="payment_limit" type="number" value={editData && editData.payment_limit} onChange={e => setEditData({...editData, payment_limit: e.target.value})} required />
+      </label>
+      <label>
+        Payment Limit Period (sec):
+        <input name="payment_limit_period_sec" type="number" value={editData && editData.payment_limit_period_sec} onChange={e => setEditData({...editData, payment_limit_period_sec: e.target.value})} required />
+      </label>
+      <button type="submit">Save</button>
+    </form>
+  </div>
+)}
    <h2>Create User Specific Limit</h2>
       <form onSubmit={createUserSpecificLimit}>
         <label>
@@ -245,14 +287,9 @@ const searchUserLimits = (e) => {
     <button type="submit">Create</button>
   </form>
 </div>
-        {/* Modal for displaying error/success messages */}
        {/* Edit limit form */}
-        {editLimit && (
-          <div className="card">
-            <h2>Edit Limit</h2>
-            {/* ... Form fields ... */}
-          </div>
-        )}
+
+
 
         {/* Create new limit form */}
         {createLimit && (

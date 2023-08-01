@@ -169,15 +169,24 @@ def update_user_payment_limit(request, format=None):
         return JsonResponse(status=403, data={'error': 'Unauthorized user'})
 
     data = json.loads(request.body)
-    phone_num = data.get('phone_num', None)
-    email = data.get('email', None)
-    keycloak_username = data.get('keycloak_username', None)
+    print(data)
+    searchValue = data.get('searchValue', None)
+    searchType = data.get('searchType', None)
     service_type_id = data.get('service_type_id')
-    payment_method_id = data.get('payment_method_id')
+    payment_method_id = data.get('payment_method')
     payment_limit = data.get('payment_limit')
     payment_limit_period_sec = data.get('payment_limit_period_sec')
-
-    if not (phone_num or email or keycloak_username) or not service_type_id or not payment_method_id or payment_limit is None or payment_limit_period_sec is None:
+    phone_num = None
+    email = None
+    keycloak_username = None
+    if searchType == 'keycloak_username':
+        keycloak_username = searchValue
+    if searchType == 'phone_num':
+        phone_num = searchValue
+    if searchType == 'email':
+        email = searchValue
+    if not (phone_num or email or keycloak_username) or not service_type_id or not payment_method_id \
+            or payment_limit is None or payment_limit_period_sec is None:
         return JsonResponse(status=400, data={'error': 'Missing required parameters in the request'})
 
     try:
