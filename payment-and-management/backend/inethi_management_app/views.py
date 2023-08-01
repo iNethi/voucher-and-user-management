@@ -12,6 +12,7 @@ from .serializers import *
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from .serializers import UserPaymentLimitsSerializer
 import pytz
 from keycloak import KeycloakOpenID
 from urllib.parse import unquote
@@ -77,43 +78,80 @@ def get_payment_methods(request):
     return JsonResponse(payment_methods_data, safe=False)
 
 
+@api_view(['POST'])
+def create_user_specific_limit(request):
+    if request.method == 'POST':
+        keycloak_id = request.data.get('keycloak_id')
+        cellphone_number = request.data.get('cellphone_number')
+        email = request.data.get('email')
+        service_type_id = request.data.get('service_type_id')
+        print(service_type_id)
+        payment_method_id = request.data.get('payment_method')
+        print(payment_method_id)
+        payment_limit = request.data.get('payment_limit')
+        payment_limit_period_sec = request.data.get('payment_limit_period_sec')
+
+        try:
+            if keycloak_id:
+                user = Users.objects.get(keycloak_username=keycloak_id)
+            elif cellphone_number:
+                user = Users.objects.get(cellphone_number=cellphone_number)
+            elif email:
+                user = Users.objects.get(email=email)
+            else:
+                return Response({"error": "No identification provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+            service_type = ServiceTypes.objects.get(pk=service_type_id)
+            payment_method = PaymentMethods.objects.get(name=payment_method_id)
+
+            # Create a new UserPaymentLimits instance
+            user_payment_limit = UserPaymentLimits(
+                user_id=user,
+                service_type_id=service_type,
+                payment_method=payment_method,
+                payment_limit=payment_limit,
+                payment_limit_period_sec=payment_limit_period_sec,
+            )
+            user_payment_limit.save()
+
+            return Response({"message": "User specific limit created successfully!"}, status=status.HTTP_201_CREATED)
+
+        except (Users.DoesNotExist, ServiceTypes.DoesNotExist, PaymentMethods.DoesNotExist):
+            return Response({"error": "Invalid user, service type, or payment method"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 @api_view(['GET'])
 def check_payment_user_limit(request, format=None):
     if not authenticate_admin_user(request):
         return JsonResponse(status=403, data={'error': 'Unauthorized user'})
 
-    service_type_name = request.GET.get('service_type_name', None)
-    payment_method = request.GET.get('payment_method', None)
     phone_num = request.GET.get('phone_num', None)
     email = request.GET.get('email', None)
     keycloak_username = request.GET.get('keycloak_username', None)
 
-    if not service_type_name or not payment_method or not (phone_num or email or keycloak_username):
+    if not (phone_num or email or keycloak_username):
         return JsonResponse(status=400, data={'error': 'Missing required parameters in the request'})
 
     try:
-        service_type = ServiceTypes.objects.get(name=service_type_name)
-    except ServiceTypes.DoesNotExist:
-        return JsonResponse(status=404, data={'error': 'service type not found'})
-
-    try:
         if phone_num:
-            user = Users.objects.get(phonenum_encrypt=phone_num)
+            user = Users.objects.get(phonenum=phone_num)
         elif email:
-            user = Users.objects.get(email_encrypt=email)
-        else:  # keycloak_id
-            user = Users.objects.get(keycloak_id=keycloak_username)
+            user = Users.objects.get(email=email)
+        else:  # keycloak_username
+            user = Users.objects.get(keycloak_username=keycloak_username)
 
-        limit = UserPaymentLimits.objects.get(user_id=user, service_type=service_type,
-                                              payment_method=payment_method)
-        serializer = UserPaymentLimitsSerializer(limit)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # Get all the limits for the user
+        limits = UserPaymentLimits.objects.filter(user_id=user)
+        if limits.exists():
+            serializer = UserPaymentLimitsSerializer(limits, many=True)
+            print(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse(status=404, data={'error': 'user payment limit not set'})
 
     except Users.DoesNotExist:
         return JsonResponse(status=404, data={'error': 'user not registered'})
-    except UserPaymentLimits.DoesNotExist:
-        return JsonResponse(status=404, data={'error': 'user payment limit not set'})
-
 
 @api_view(['PUT'])
 def update_user_payment_limit(request, format=None):

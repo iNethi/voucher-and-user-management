@@ -20,6 +20,8 @@ urlpatterns = [
     path('get-my-payments/', views.get_keycloak_payments_from_token),
     path('get-services/', views.request_services),
     path('update-user-payment-limit/', views.update_user_payment_limit),
+    path('create-user-specific-limit/', views.create_user_specific_limit),
+    path('search-user-limits/', views.check_payment_user_limit),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
