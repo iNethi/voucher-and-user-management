@@ -35,7 +35,7 @@ const UserList = () => {
         <tbody>
           {users.map(user => (
             <tr key={user.id}>
-              <td>{user.username}</td>
+              <td>{user.keycloak_username}</td>
             </tr>
           ))}
         </tbody>

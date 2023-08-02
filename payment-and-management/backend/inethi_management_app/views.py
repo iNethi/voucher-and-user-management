@@ -586,6 +586,29 @@ def get_keycloak_users(request, format=None):
                                    realm_name="master",
                                    client_id="portal-local")
 
-    users = keycloak_admin.get_users({})
-    print(users)
-    return Response(users)
+    keycloak_users = keycloak_admin.get_users({})
+
+    django_users = []
+    for keycloak_user in keycloak_users:
+        django_user = add_or_get_user_from_keycloak(keycloak_user)
+        print(django_user)
+        django_users.append(django_user)
+
+    # Optionally, serialize the Django users and return them
+    serializer = UsersSerializer(django_users, many=True)
+    print(serializer.data)
+    return Response(serializer.data)
+
+
+def add_or_get_user_from_keycloak(keycloak_user):
+    keycloak_username = keycloak_user['username']
+    email = keycloak_user.get('email', None)
+
+    # Check if a user with the given Keycloak username exists
+    user, created = Users.objects.get_or_create(keycloak_username=keycloak_username,
+                                                defaults={
+                                                    'email': email,
+                                                    'joindate_time': datetime.now(),
+                                                })
+
+    return user
