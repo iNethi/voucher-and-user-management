@@ -70,7 +70,7 @@ function ServicePage() {
       <div className="homepage-content">
         <h1>Services</h1>
         <h2>Available Services</h2>
-        <table className="table">
+        <table className="table table-striped">
           <thead className="thead-light">
             <tr>
               <th>Name</th>

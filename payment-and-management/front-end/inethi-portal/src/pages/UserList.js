@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import Navigation from "../Components/Navigation/Navigation";
 import {useKeycloak} from "@react-keycloak/web";
 
 const UserList = () => {
@@ -19,7 +20,11 @@ const UserList = () => {
   }, []);
 
   return (
-    <div className="container mt-5">
+    <div className="homepage-container">
+      <div>
+        <Navigation />
+      </div>
+      <div className="homepage-content">
       <h2>Users</h2>
       <table className="table table-striped">
         <thead>
@@ -36,6 +41,7 @@ const UserList = () => {
         </tbody>
       </table>
     </div>
+      </div>
   );
 };
 

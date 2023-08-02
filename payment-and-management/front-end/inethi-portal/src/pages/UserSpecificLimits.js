@@ -178,7 +178,7 @@ const searchUserData = () => {
           <div>
             <h2>User Limits</h2>
             {/* Table to display user-specific limits */}
-        <table className="table">
+        <table className="table table-striped">
           <thead className="thead-light">
     <tr>
       <th>Service Name</th>

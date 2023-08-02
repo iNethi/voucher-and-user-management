@@ -220,7 +220,7 @@ function Package() {
       <div className="homepage-content">
         <h2>Packages</h2>
         {packages.length > 0 ? (
-          <table className="table">
+          <table className="table table-striped">
             <thead className="thead-light">
               <tr>
                 <th>Name</th>

@@ -149,7 +149,7 @@ const createNewLimit = e => {
         <h1>Default Purchase Limits</h1>
         <div>
           <h2>Default Limits</h2>
-        <table className="table">
+        <table className="table table-striped">
   <thead className="thead-light">
     <tr>
       <th>Service Name</th>
