@@ -19,6 +19,7 @@ const Navigation = () => {
             <Nav.Link as={Link} to="/user-purchase-limits">User Purchase Limits</Nav.Link>
             <Nav.Link as={Link} to="/purchase">Purchase</Nav.Link>
             <Nav.Link as={Link} to="/purchase-history">Purchase History</Nav.Link>
+            <Nav.Link as={Link} to="/keycloak-users">Users</Nav.Link>
           </Nav>
       </Container>
     </Navbar>

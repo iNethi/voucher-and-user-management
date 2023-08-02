@@ -10,6 +10,7 @@ import ServicePage from "./pages/ServicePage";
 import Package from "./pages/Package";
 import PurchaseHistory from "./pages/PurchaseHistory";
 import UserSpecificLimits from "./pages/UserSpecificLimits";
+import UserList from "./pages/UserList";
 
 function App() {
   const { keycloak, initialized } = useKeycloak();
@@ -31,7 +32,8 @@ function App() {
         <Route path="/services" element={<ServicePage />} />
         <Route path="/packages" element={<Package />} />
         <Route path="/purchase" element={<Purchase />} />
-        <Route path="/purchase-history" element={<PurchaseHistory />} />
+        <Route path="/purchase-history" element={<PurchaseHistory />} />\
+        <Route path="/keycloak-users" element={<UserList />} />
 
       </Routes>
     </BrowserRouter>

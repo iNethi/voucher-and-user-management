@@ -16,6 +16,7 @@ from .serializers import UserPaymentLimitsSerializer
 import pytz
 from keycloak import KeycloakOpenID
 from urllib.parse import unquote
+from keycloak import KeycloakAdmin
 
 keycloak_openid = KeycloakOpenID(
     server_url="https://keycloak.inethilocal.net/auth/",
@@ -130,7 +131,6 @@ def create_user_specific_limit(request):
                             status=status.HTTP_400_BAD_REQUEST)
 
 
-
 @api_view(['GET'])
 def check_payment_user_limit(request, format=None):
     if not authenticate_admin_user(request):
@@ -162,6 +162,7 @@ def check_payment_user_limit(request, format=None):
 
     except Users.DoesNotExist:
         return JsonResponse(status=404, data={'error': 'user not registered'})
+
 
 @api_view(['PUT'])
 def update_user_payment_limit(request, format=None):
@@ -210,7 +211,6 @@ def update_user_payment_limit(request, format=None):
 
     serializer = UserPaymentLimitsSerializer(limit)
     return Response(serializer.data, status=status.HTTP_200_OK if not created else status.HTTP_201_CREATED)
-
 
 
 @api_view(['GET'])
@@ -573,3 +573,19 @@ def create_service_type(request):
 
         serializer = ServiceTypesSerializer(new_service_type)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+def get_keycloak_users(request, format=None):
+    if not authenticate_admin_user(request):
+        return JsonResponse(status=403, data={'error': 'Unauthorized user'})
+
+    keycloak_admin = KeycloakAdmin(server_url="https://keycloak.inethilocal.net/auth/",
+                                   username="inethi",
+                                   password="password",
+                                   realm_name="master",
+                                   client_id="portal-local")
+
+    users = keycloak_admin.get_users({})
+    print(users)
+    return Response(users)
