@@ -7,7 +7,7 @@ import {useKeycloak} from "@react-keycloak/web";
 
 function PurchaseLimits() {
   const { keycloak } = useKeycloak();
-  axios.defaults.baseURL = 'http://0.0.0.0:8000';
+  axios.defaults.baseURL = 'http://paum.inethilocal.net';
   axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
   const [showModal, setShowModal] = useState(false);
   const [responseMessage, setResponseMessage] = useState('');

@@ -7,7 +7,7 @@ import { Form, Button } from 'react-bootstrap';
 
 function Package() {
   const { keycloak } = useKeycloak();
-  axios.defaults.baseURL = 'http://0.0.0.0:8000';
+  axios.defaults.baseURL = 'http://paum.inethilocal.net';
   axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
   const [packageFormData, setPackageFormData] = useState({
     name: '',
@@ -182,7 +182,7 @@ function Package() {
     setErrorMessage("");
 
     axios
-      .put(`http://0.0.0.0:8000/edit-package/${encodeURIComponent(selectedPackage.name)}/`, updatedPackage)
+      .put(`/edit-package/${encodeURIComponent(selectedPackage.name)}/`, updatedPackage)
       .then(response => {
     // Retrieve the updated package from the response data
     const updatedPackageData = response.data;

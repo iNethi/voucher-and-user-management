@@ -10,7 +10,7 @@ function UserSpecificLimits() {
   const [searchTerm, setSearchTerm] = useState('');
     const [searchType, setSearchType] = useState('keycloak_username'); // default search type
 
-  axios.defaults.baseURL = 'http://0.0.0.0:8000';
+  axios.defaults.baseURL = 'http://paum.inethilocal.net';
   axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
   const [userLimitData, setUserLimitData] = useState({
     keycloak_id: '',
@@ -66,7 +66,7 @@ const edit = (limit) => {
       searchType: searchType,
     searchValue: searchTerm, // Include the search term in the payload
   };
-    axios.put('http://0.0.0.0:8000/update-user-payment-limit/', payload, {
+    axios.put('/update-user-payment-limit/', payload, {
       headers: { 'Authorization': `Bearer ${keycloak.token}` }
     })
       .then(response => {
@@ -99,7 +99,7 @@ const searchUserLimits = (e) => {
 };
 
 const searchUserData = () => {
-  const searchUrl = `http://0.0.0.0:8000/search-user-limits/?${searchType}=${searchTerm}`;
+  const searchUrl = `/search-user-limits/?${searchType}=${searchTerm}`;
 
   axios.get(searchUrl, {
     headers: { 'Authorization': `Bearer ${keycloak.token}` }
@@ -124,8 +124,7 @@ const searchUserData = () => {
 
   const createUserSpecificLimit = (e) => {
     e.preventDefault();
-    // Replace this URL with the correct endpoint for creating user-specific limits
-    axios.post('http://0.0.0.0:8000/create-user-specific-limit/', {
+    axios.post('/create-user-specific-limit/', {
       ...userLimitData,
       token: keycloak.token,
     })
