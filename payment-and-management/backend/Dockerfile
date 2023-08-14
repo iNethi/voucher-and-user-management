@@ -2,12 +2,13 @@
 FROM python:3.9-slim AS base
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies for mysqlclient
 RUN apt-get update && apt-get install -y \
     default-libmysqlclient-dev \
     gcc \
-    && apt-get clean
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Now install your Python packages
 COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
