@@ -2,8 +2,7 @@
 FROM node:18-alpine AS base
 WORKDIR /app
 COPY package.json .
-RUN npm install -g npm@9.8.1` to update!
-RUN npm install
+RUN npm install --legacy-peer-deps
 COPY . .
 
 # ---- Build ----
@@ -17,5 +16,9 @@ COPY --from=build /app/build /usr/share/nginx/html
 # Copy the default nginx.conf provided by tiangolo/node-frontend
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# Copy start script and make it executable
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/start.sh"]
