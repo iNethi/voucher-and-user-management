@@ -1,6 +1,11 @@
 # iNethi Management and Payment System
 A user management portal for iNethi that uses React and Django.
-
+## Running this code (PROD)
+1. Ensure you have keycloak and traefik running and a volume folder to store data at `/mnt/data/inethi_user_management_mysql`. Set up a keycloak client.
+2. run the build script located at `payment-and-management/build.sh`:
+```
+./build.sh
+```
 ## Running this code (no radius desk)
 1. Ensure you have traefik running with a keycloak instance running.
    1. Ensure a keycloak client is set up for both django and react purposes. The configs can be found in [here](./config) and can 
