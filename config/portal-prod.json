@@ -1,16 +1,16 @@
 {
     "clientId": "portal-local",
-    "rootUrl": "https://manager.inethilocal.net/",
-    "adminUrl": "https://manager.inethilocal.net/",
+    "rootUrl": "https://usermanagement.inethilocal.net",
+    "adminUrl": "https://usermanagement.inethilocal.net",
     "surrogateAuthRequired": false,
     "enabled": true,
     "alwaysDisplayInConsole": false,
     "clientAuthenticatorType": "client-secret",
     "redirectUris": [
-        "https://manager.inethilocal.net/*"
+        "https://usermanagement.inethilocal.net/*"
     ],
     "webOrigins": [
-        "https://manager.inethilocal.net/"
+        "https://usermanagement.inethilocal.net"
     ],
     "notBefore": 0,
     "bearerOnly": false,
