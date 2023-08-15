@@ -8,7 +8,7 @@ function PurchaseHistory() {
     const [payments, setPayments] = useState([]);
     const { keycloak } = useKeycloak();
     const [services, setServices] = useState([]);
-      axios.defaults.baseURL = 'http://paum.inethilocal.net';
+      axios.defaults.baseURL = 'https://paum.inethilocal.net';
       axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
 
 

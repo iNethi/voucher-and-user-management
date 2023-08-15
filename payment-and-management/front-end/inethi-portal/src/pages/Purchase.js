@@ -7,7 +7,7 @@ import {useKeycloak} from "@react-keycloak/web";
 function Purchase() {
   const [packages, setPackages] = useState([]);
   const { keycloak } = useKeycloak();
-  axios.defaults.baseURL = 'http://paum.inethilocal.net';
+  axios.defaults.baseURL = 'https://paum.inethilocal.net';
   axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
   useEffect(() => {
     // Fetch packages

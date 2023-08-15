@@ -4,7 +4,7 @@ import { useKeycloak } from "@react-keycloak/web";
 import "./HomePage.css";
 import Navigation from "../Components/Navigation/Navigation";
 import axios from "axios";
-axios.defaults.baseURL = 'http://paum.inethilocal.net';
+axios.defaults.baseURL = 'https://paum.inethilocal.net';
 function HomePage() {
   const { keycloak } = useKeycloak();
 

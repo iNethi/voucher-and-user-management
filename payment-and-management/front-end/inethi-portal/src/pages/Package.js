@@ -7,7 +7,7 @@ import { Form, Button } from 'react-bootstrap';
 
 function Package() {
   const { keycloak } = useKeycloak();
-  axios.defaults.baseURL = 'http://paum.inethilocal.net';
+  axios.defaults.baseURL = 'https://paum.inethilocal.net';
   axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
   const [packageFormData, setPackageFormData] = useState({
     name: '',

@@ -6,7 +6,7 @@ import {useKeycloak} from "@react-keycloak/web";
 const UserList = () => {
   const [users, setUsers] = useState([]);
     const { keycloak } = useKeycloak();
-  axios.defaults.baseURL = 'http://paum.inethilocal.net';
+  axios.defaults.baseURL = 'https://paum.inethilocal.net';
   axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
 
   useEffect(() => {

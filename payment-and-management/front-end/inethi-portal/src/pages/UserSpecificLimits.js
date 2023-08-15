@@ -10,7 +10,7 @@ function UserSpecificLimits() {
   const [searchTerm, setSearchTerm] = useState('');
     const [searchType, setSearchType] = useState('keycloak_username'); // default search type
 
-  axios.defaults.baseURL = 'http://paum.inethilocal.net';
+  axios.defaults.baseURL = 'https://paum.inethilocal.net';
   axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
   const [userLimitData, setUserLimitData] = useState({
     keycloak_id: '',

@@ -7,7 +7,7 @@ import { useKeycloak } from "@react-keycloak/web";
 
 function ServicePage() {
   const { keycloak } = useKeycloak();
-  axios.defaults.baseURL = 'http://paum.inethilocal.net';
+  axios.defaults.baseURL = 'https://paum.inethilocal.net';
   axios.defaults.headers.common['Authorization'] = `Bearer ${keycloak.token}`;
   const [services, setServices] = useState([]);
   const [showModal, setShowModal] = useState(false);
