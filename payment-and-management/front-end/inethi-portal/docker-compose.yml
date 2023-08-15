@@ -6,7 +6,7 @@ services:
     container_name: inethi-management-frontend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.managerFrontend.rule=Host(`manager.inethilocal.net`)"
+      - "traefik.http.routers.managerFrontend.rule=Host(`usermanagement.inethilocal.net`)"
       - "traefik.http.routers.managerFrontend.entrypoints=websecure"
       - "traefik.http.services.managerFrontend.loadbalancer.server.port=80"
 networks:
