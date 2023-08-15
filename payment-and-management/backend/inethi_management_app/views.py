@@ -29,29 +29,39 @@ def authenticate_keycloak_user(request):
     token = request.META.get('HTTP_AUTHORIZATION')
 
     if not token:
+        print("Did not receive token:")
         return False
     try:
+        print('received token')
         token = token.split(" ")
+        print('the token is:', token)
         user_info = keycloak_openid.userinfo(token[1])
-        print(user_info)
+        print("The user info is:", user_info)
+        print("The username is:", user_info['preferred_username'])
         if user_info:
             return True
         else:
             return False
-    except:
+    except Exception as e:
+        print(e)
+        print("ERROR authenticating user. Returning FALSE")
         return False
 
 
 def get_user_name(request):
     token = request.META.get('HTTP_AUTHORIZATION')
     if not token:
+        print("Did not receive token:")
         return None
     try:
         token = token.split(" ")
         user_info = keycloak_openid.userinfo(token[1])
+        print("The user info is:", user_info)
+        print("The username is:", user_info['preferred_username'])
         user_name = user_info['preferred_username']
         return user_name
     except:
+        print("ERROR getting user name. Retruning FALSE")
         return None
 
 
@@ -250,6 +260,7 @@ def check_payment_default_limit(request, format=None):
 @api_view(['GET'])
 def request_services(request, format=None):
     if not authenticate_keycloak_user(request):
+        print("COULD NOT AUTH USER")
         return JsonResponse(status=403, data={'error': 'Unauthorized user'})
 
     if request.method == 'GET':
