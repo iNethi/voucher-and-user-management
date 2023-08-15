@@ -18,8 +18,8 @@ services:
     build:
       context: ./
     container_name: inethi-user-management
-    command: bash -c "./wait-for-it.sh inethi-user-management-mysql:3306 -- python manage.py makemigrations && python manage.py migrate && gunicorn inethi_management.wsgi:application --bind 0.0.0.0:8000 --access-logfile '-' --error-logfile '-'"
-#    command: bash -c "./wait-for-it.sh inethi-user-management-mysql:3306 -- python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+#    command: bash -c "./wait-for-it.sh inethi-user-management-mysql:3306 -- python manage.py makemigrations && python manage.py migrate && gunicorn inethi_management.wsgi:application --bind 0.0.0.0:8000 --access-logfile '-' --error-logfile '-'"
+    command: bash -c "./wait-for-it.sh inethi-user-management-mysql:3306 -- python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     depends_on:
       - inethi-user-management-mysql
     labels:
