@@ -1,5 +1,8 @@
 # iNethi Management and Payment System
 A user management portal for iNethi that uses React and Django.
+
+## Notes
+- Ensure your server can locate `paum.inethilocal.net`, `keycloal.inethilocal.net`, etc.
 ## Running this code (PROD)
 1. Ensure you have keycloak and traefik running and a volume folder to store data at 
 `/mnt/data/inethi_user_management_mysql`. Set up a keycloak client found in the config file. Use local or prod version,

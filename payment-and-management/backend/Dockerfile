@@ -6,6 +6,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     default-libmysqlclient-dev \
     gcc \
+    pkg-config \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Now install your Python packages
