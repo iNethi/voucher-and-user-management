@@ -32,9 +32,7 @@ def authenticate_keycloak_user(request):
         print("Did not receive token:")
         return False
     try:
-        print('received token')
         token = token.split(" ")
-        print('the token is:', token)
         user_info = keycloak_openid.userinfo(token[1])
         print("The user info is:", user_info)
         print("The username is:", user_info['preferred_username'])
