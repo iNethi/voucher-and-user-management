@@ -17,7 +17,7 @@ services:
     build:
       context: ./
     container_name: inethi-user-management
-    command: bash -c "./wait-for-it.sh inethi-user-management-mysql:3306 -- python manage.py migrate && gunicorn inethi_management.wsgi:application --bind 0.0.0.0:8000"
+    command: bash -c "./wait-for-it.sh inethi-user-management-mysql:3306 -- python manage.py manage.py makemigrations && migrate && gunicorn inethi_management.wsgi:application --bind 0.0.0.0:8000"
     depends_on:
       - inethi-user-management-mysql
     labels:

@@ -58,15 +58,22 @@ def get_user_name(request):
 def authenticate_admin_user(request):
     token = request.META.get('HTTP_AUTHORIZATION')
     if not token:
+        print("Did not receive token:")
         return False
+    print("Received Token:", token)
     try:
         token = token.split(" ")
         user_info = keycloak_openid.userinfo(token[1])
+        print("The user info is:", user_info)
+        print("The username is:", user_info['preferred_username'])
         if user_info['preferred_username'] == 'inethi':
+            print("returning TRUE")
             return True
         else:
+            print("returning FALSE")
             return False
     except:
+        print("ERROR authenticating admin user. Retruning FALSE")
         return False
 
 
