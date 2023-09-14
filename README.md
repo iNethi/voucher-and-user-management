@@ -60,7 +60,9 @@ DATABASES = {
 ```
 npm start
 ```
-4. Navigate to [the front end](http://localhost:3000/) in your browser. Login with a keycloak user and test the app.
+4. Navigate to `payment-and-management/front-end/inethi-portal/src/pages` and change the lines 
+`axios.defaults.baseURL =` variable to have a value of `'http://127.0.0.1:8000';`
+7. Navigate to [the front end](http://localhost:3000/) in your browser. Login with a keycloak user and test the app.
 
 ## Keycloak
 ### Clients
