@@ -14,7 +14,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.djangomysql.entrypoints=websecure"
 
-  inethi-maintainer-backend:
+  inethi-user-management:
     build:
       context: ./
     container_name: inethi-user-management
